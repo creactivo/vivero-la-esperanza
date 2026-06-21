@@ -1,0 +1,127 @@
+---
+import type { Proyecto } from "../lib/strapi-projects";
+import { getImageUrl } from "../lib/strapi-projects";
+
+interface Props {
+    proyecto: Proyecto;
+}
+
+const { proyecto } = Astro.props;
+
+if (!proyecto?.slug) {
+    return null;
+}
+
+const { nombre, descripcion, slug, imagenes } = proyecto;
+
+const imageUrl = imagenes?.[0]
+    ? getImageUrl(imagenes[0].url)
+    : "/images/Jardin-2.jpg";
+---
+
+<article class="project-card">
+    <a href={`/proyectos/${slug}`} class="block img-link">
+        <div class="image-wrapper">
+            <img
+                src={imageUrl}
+                alt={nombre}
+                loading="lazy"
+                transition:name={`image-${slug}`}
+            />
+        </div>
+    </a>
+
+    <div class="card-content text-center">
+        <h3 class="project-title">
+            <a href={`/proyectos/${slug}`}>{nombre}</a>
+        </h3>
+        <p class="project-description">
+            {descripcion}
+        </p>
+        <a href={`/proyectos/${slug}`} class="btn btn-secondary btn-sm btn-view-project">
+            VER PROYECTO
+        </a>
+    </div>
+</article>
+
+<style>
+    .project-card {
+        background: white;
+        padding: 20px;
+        position: relative;
+        transition: all 0.3s ease;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .image-wrapper {
+        aspect-ratio: 16 / 9; /* Typical image aspect ratio */
+        overflow: hidden;
+        margin-bottom: 20px;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .project-card:hover img {
+        transform: scale(1.05);
+    }
+
+    .card-content {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .project-title {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .project-title a {
+        text-decoration: none;
+        color: var(--color-primary-dark);
+    }
+
+    .project-description {
+        font-size: 0.9rem;
+        color: var(--color-text-light);
+        margin-bottom: 15px;
+        flex-grow: 1; /* Allow description to take available space */
+    }
+
+    .btn-view-project {
+        background-color: var(--color-primary); /* Green color */
+        color: white;
+        padding: 10px 25px;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+        border-radius: var(--radius-full);
+        margin-top: auto; /* Push button to the bottom */
+        text-decoration: none;
+        display: inline-block; /* Ensure padding and margin work correctly */
+    }
+
+    .btn-view-project:hover {
+        background-color: var(--color-primary-dark);
+    }
+</style>

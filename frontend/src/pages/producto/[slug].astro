@@ -1,0 +1,345 @@
+---
+export const prerender = true;
+
+import Layout from "../../layouts/Layout.astro";
+import { getProductoBySlug, getImageUrl, getProductos } from "../../lib/strapi";
+import AddToCartButton from "../../components/AddToCartButton";
+
+export async function getStaticPaths() {
+    const productos = await getProductos();
+    return productos.map((producto) => ({
+        params: { slug: producto.slug },
+    }));
+}
+
+const { slug } = Astro.params;
+
+const producto = await getProductoBySlug(slug as string);
+
+if (!producto) {
+    return Astro.redirect('/404');
+}
+
+const {
+    nombre,
+    descripcion,
+    precio,
+    precioMayorista,
+    cantidadMinima,
+    stock,
+    imagenes,
+    categoria,
+} = producto;
+
+const imageUrls = imagenes?.map((img: any) => getImageUrl(img.url)) || [];
+const mainImage = imageUrls[0] || "/images/Jardin-2.jpg";
+---
+
+<Layout title={nombre} description={descripcion}>
+    <!-- Breadcrumb Header Centrado -->
+    <div class="product-header-section text-center">
+        <span class="detail-badge">DETALLES DEL PRODUCTO</span>
+        <h1 class="main-title">{nombre}</h1>
+        <div class="breadcrumb-nav">
+            <a href="/">Inicio</a> /
+            {
+                categoria && (
+                    <a href={`/categoria/${categoria.slug}`}>
+                        {categoria.nombre}
+                    </a>
+                )
+            } /
+            <span>{nombre}</span>
+        </div>
+    </div>
+
+    <div class="container product-container">
+        <div class="product-layout">
+            <!-- Columna Izq: Imagen -->
+            <div class="product-gallery">
+                <div class="main-image-frame">
+                    <img
+                        src={mainImage}
+                        alt={nombre}
+                        id="mainImage"
+                        transition:name={`image-${slug}`}
+                    />
+                </div>
+                {
+                    imageUrls.length > 1 && (
+                        <div class="thumbnails">
+                            {imageUrls.map((url: string, index: number) => (
+                                <button
+                                    class={`thumb-btn ${index === 0 ? "active" : ""}`}
+                                    data-src={url}
+                                >
+                                    <img
+                                        src={url}
+                                        alt={`${nombre} ${index + 1}`}
+                                    />
+                                </button>
+                            ))}
+                        </div>
+                    )
+                }
+            </div>
+
+            <!-- Columna Der: Info y Compra -->
+            <div class="product-info-col">
+                <div class="badges mb-4">
+                    <span class="cat-pill">PLANTAS DE INTERIOR</span>
+                </div>
+
+                <h2 class="product-name-large">{nombre}</h2>
+
+                <div class="product-description-text" set:html={descripcion} />
+
+                <div class="pricing-box">
+                    <div class="price-row">
+                        <span class="label">Precio regular:</span>
+                        <span class="val old-price"
+                            >${precio.toLocaleString("es-CO")}</span
+                        >
+                    </div>
+                    <div class="price-row main">
+                        <span class="label">Precio mayorista:</span>
+                        <span class="val big-price"
+                            >${precioMayorista.toLocaleString("es-CO")}</span
+                        >
+                    </div>
+
+                    <div class="savings-alert">
+                        Ahorra ${
+                            (precio - precioMayorista).toLocaleString("es-CO")
+                        } por unidad
+                    </div>
+                </div>
+
+                <div class="meta-info">
+                    <div class="meta-row">
+                        <strong>Cantidad mínima:</strong>
+                        <span>{cantidadMinima} unidades</span>
+                    </div>
+                    <div class="meta-row">
+                        <strong>Stock disponible:</strong>
+                        <span class="stock-ok">{stock} en stock</span>
+                    </div>
+                </div>
+
+                <!-- Botón de compra (React) -->
+                <AddToCartButton
+                    client:load
+                    productoId={producto.id}
+                    nombre={nombre}
+                    precioMayorista={precioMayorista}
+                    cantidadMinima={cantidadMinima}
+                    slug={slug}
+                    stock={stock}
+                    imagenUrl={mainImage}
+                />
+            </div>
+        </div>
+    </div>
+</Layout>
+
+<script>
+    // Simple gallery script
+    const thumbs = document.querySelectorAll(".thumb-btn");
+    const mainImg = document.getElementById("mainImage") as HTMLImageElement;
+
+    thumbs.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const src = btn.getAttribute("data-src");
+            if (src && mainImg) mainImg.src = src;
+            thumbs.forEach((t) => t.classList.remove("active"));
+            btn.classList.add("active");
+        });
+    });
+</script>
+
+<style>
+    .product-header-section {
+        padding: 160px 0 40px;
+        background: radial-gradient(
+            circle at center,
+            rgba(230, 240, 230, 0.5) 0%,
+            transparent 70%
+        );
+        background-image: url("../images/hero-bg.jpg");
+		background-size: cover;
+		background-position: center bottom;
+		background-repeat: no-repeat;
+    }
+
+    .detail-badge {
+        background: #d8e2dc; /* Verde grisaceo suave */
+        color: #555;
+        font-size: 0.65rem;
+        padding: 6px 16px;
+        border-radius: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    .main-title {
+        font-size: 2.8rem;
+        color: var(--color-primary);
+        margin-bottom: 10px;
+        letter-spacing: -1px;
+    }
+
+    .breadcrumb-nav {
+        font-size: 0.85rem;
+        color: #888;
+    }
+    .breadcrumb-nav a {
+        color: #666;
+        text-decoration: none;
+    }
+
+    .product-container {
+        padding-bottom: 80px;
+    }
+
+    .product-layout {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 60px;
+        margin-top: 40px;
+        align-items: start;
+    }
+
+    .main-image-frame {
+        background: #f5f5f5; /* Fondo gris muy suave como en mockups */
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .main-image-frame img {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+    }
+
+    .thumbnails {
+        display: flex;
+        gap: 10px;
+    }
+    .thumb-btn {
+        width: 80px;
+        height: 80px;
+        border: 1px solid transparent;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        cursor: pointer;
+        background: #f9f9f9;
+        transition: border-color 0.3s;
+    }
+    .thumb-btn.active {
+        border-color: var(--color-primary);
+    }
+    .thumb-btn img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Info Column */
+    .badges {
+        margin-bottom: 10px;
+    }
+    .cat-pill {
+        background: #e8e8e8;
+        font-size: 0.6rem;
+        padding: 4px 10px;
+        border-radius: 4px;
+        letter-spacing: 1px;
+        color: #666;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .product-name-large {
+        font-size: 2.2rem;
+        color: var(--color-primary);
+        margin-bottom: 20px;
+        line-height: 1.2;
+    }
+
+    .product-description-text {
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.7;
+        font-size: 0.95rem;
+    }
+
+    .pricing-box {
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 1rem;
+    }
+
+    .old-price {
+        text-decoration: line-through;
+        color: #999;
+    }
+
+    .price-row.main {
+        align-items: baseline;
+    }
+
+    .big-price {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--color-primary);
+    }
+
+    .savings-alert {
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-align: center;
+        border-radius: var(--radius-sm);
+        margin-top: 15px;
+    }
+
+    .meta-info {
+        margin-bottom: 30px;
+        font-size: 0.9rem;
+    }
+    .meta-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        border-bottom: 1px dashed #eee;
+        padding-bottom: 8px;
+    }
+    .stock-ok {
+        color: green;
+        font-weight: 600;
+    }
+
+    @media (max-width: 900px) {
+        .product-layout {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+    }
+</style>

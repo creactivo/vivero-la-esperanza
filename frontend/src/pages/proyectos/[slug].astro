@@ -1,0 +1,210 @@
+---
+export const prerender = true;
+
+import Layout from "../../layouts/Layout.astro";
+import type { Proyecto } from "../../lib/strapi-projects";
+import { getProjectsBySlug, getImageUrl, getProjects } from "../../lib/strapi-projects";
+import { marked } from "marked";
+
+export async function getStaticPaths() {
+    const proyectos = await getProjects();
+    return proyectos.map((proyecto) => ({
+        params: { slug: proyecto.slug },
+    }));
+}
+
+const { slug } = Astro.params;
+
+const project = await getProjectsBySlug(slug as string);
+
+if (!project) {
+    return Astro.redirect('/proyectos');
+}
+
+const projectSafe = project as Proyecto;
+
+// Convert rich text 'descripcion' to HTML if it exists
+const projectDetailsHtml = projectSafe.descripcion ? marked.parse(projectSafe.descripcion) : '';
+const galleryUrls = (projectSafe.imagenes?.map((img: { url: string }) => getImageUrl(img.url))) || [];  
+const mainImageUrl = projectSafe.imagenes && projectSafe.imagenes.length > 0 ? getImageUrl(projectSafe.imagenes[0].url) : '/images/Jardin-1.jpg';
+---
+
+<Layout title={projectSafe.nombre}>
+    <section class="project-detail-hero" style={`background-image: url('${mainImageUrl}');`}>
+        <div class="container text-center">
+            <h1 class="project-title-detail">{projectSafe.nombre}</h1>
+            <p class="project-description-detail">{projectSafe.descripcion}</p>
+        </div>
+    </section> 
+
+    <section class="project-content container section-padding">
+        <div class="project-main-info">
+            <h2>Detalles del Proyecto</h2>
+            <div set:html={projectDetailsHtml} class="project-details-html"></div>
+            <!-- Static details below can be removed or replaced with dynamic fields from Strapi if added -->
+            <p><strong>Ubicación:</strong> Ciudad de México, México</p>
+            <p><strong>Fecha de Realización:</strong> Octubre 2024</p>
+            <p><strong>Servicios Incluidos:</strong> Diseño, Suministro, Instalación, Mantenimiento.</p>
+        </div>
+
+        {galleryUrls.length > 0 && (
+            <div class="project-gallery mt-8">
+                <h2>Galería de Imágenes</h2>
+                <div class="gallery-grid">
+                    {galleryUrls.map((imgSrc: string) => (
+                        <div class="gallery-item">
+                            <img src={imgSrc} alt={projectSafe.nombre} class="responsive-image" loading="lazy" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )}
+
+        <div class="back-link-container text-center mt-8">
+            <a href="/proyectos" class="btn btn-secondary">← Volver a Proyectos</a>
+        </div>
+    </section>
+</Layout>
+
+<style>
+    .project-detail-hero {
+        padding: 180px 0 80px;
+        background-position: center center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        position: relative;
+        color: white;
+    }
+
+    .project-detail-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+        z-index: 1;
+    }
+
+    .project-detail-hero .container {
+        position: relative;
+        z-index: 2;
+    }
+
+    .project-title-detail {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+        color: white;
+    }
+
+    .project-description-detail {
+        font-size: 1.2rem;
+        max-width: 800px;
+        margin: 0 auto;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .section-padding {
+        padding: 80px 0;
+    }
+
+    .project-main-info {
+        max-width: 800px;
+        margin: 0 auto;
+        padding-bottom: 40px;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .project-main-info h2 {
+        font-size: 2rem;
+        color: var(--color-primary-dark);
+        margin-bottom: 20px;
+    }
+
+    /* Style for the dynamically rendered rich text details */
+    .project-details-html {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: var(--color-text);
+        margin-bottom: 15px;
+    }
+
+    .project-details-html p {
+        margin-bottom: 1em;
+    }
+    .project-details-html strong {
+        font-weight: bold;
+    }
+    .project-details-html em {
+        font-style: italic;
+    }
+    .project-details-html ul, .project-details-html ol {
+        margin-left: 20px;
+        margin-bottom: 1em;
+    }
+    .project-details-html ul li, .project-details-html ol li {
+        margin-bottom: 0.5em;
+    }
+
+
+    .project-main-info p strong { /* For static details like Ubicación, Fecha */
+        color: var(--color-primary-dark);
+    }
+
+    .project-gallery h2 {
+        font-size: 2rem;
+        color: var(--color-primary-dark);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .gallery-item {
+        overflow: hidden;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 200px; /* Fixed height for gallery images */
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .gallery-item img:hover {
+        transform: scale(1.05);
+    }
+
+    .mt-8 {
+        margin-top: 60px;
+    }
+
+    .btn-secondary {
+        background-color: var(--color-background-dark);
+        color: var(--color-text);
+        padding: 12px 25px;
+        border-radius: var(--radius-full);
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--color-text-light);
+    }
+
+    @media (max-width: 768px) {
+        .project-title-detail {
+            font-size: 2.5rem;
+        }
+        .project-main-info {
+            padding-bottom: 30px;
+        }
+    }
+</style>

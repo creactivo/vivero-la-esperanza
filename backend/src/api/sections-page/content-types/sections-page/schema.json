@@ -1,0 +1,26 @@
+{
+  "kind": "singleType",
+  "collectionName": "sections_pages",
+  "info": {
+    "singularName": "sections-page",
+    "pluralName": "sections-pages",
+    "displayName": "sections-page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "descriptions": {
+      "type": "text"
+    },
+    "componente": {
+      "type": "component",
+      "component": "banner-hero.hero-principal",
+      "repeatable": false
+    }
+  }
+}

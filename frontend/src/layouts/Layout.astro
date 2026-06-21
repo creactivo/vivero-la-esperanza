@@ -1,0 +1,59 @@
+---
+import "../styles/global.css";
+import "../styles/components.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import WhatsAppButton from "../components/WhatsAppButton.astro";
+import { ClientRouter } from "astro:transitions";
+
+interface Props {
+    title?: string;
+    description?: string;
+}
+
+const {
+    title = "Tienda Esperanza",
+    description = "Vivero mayorista de plantas",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="description" content={description} />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{title} | Esperanza Vivero</title>
+        <ClientRouter />
+    </head>
+    <body>
+        <div class="site-wrapper">
+            <Header />
+
+            <!-- Main Content -->
+            <main>
+                <slot />
+            </main>
+
+            <Footer />
+            <WhatsAppButton />
+        </div>
+    </body>
+</html>
+
+<style>
+    /* Layout Global */
+    .site-wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background: var(--color-background);
+    }
+
+    main {
+        flex: 1;
+        position: relative;
+    }
+</style>

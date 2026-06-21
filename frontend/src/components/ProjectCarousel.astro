@@ -1,0 +1,302 @@
+---
+import ProjectCard from "./ProjectCard.astro";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { Proyecto } from "../lib/strapi-projects";
+
+interface Props {
+    title?: string;
+    projects: Proyecto[];
+    visibleItems?: number;
+    showHeader?: boolean;
+}
+
+const {
+    title = "",
+    projects = [],
+    visibleItems = 2,
+    showHeader = true,
+} = Astro.props;
+
+// Duplicamos items para efecto infinito
+const displayProjects =
+    projects.length > 1 ? [...projects, ...projects, ...projects] : projects;
+
+const gapSize = 30;
+---
+
+<section class="project-section" data-visible-items={visibleItems}>
+    <div class="container">
+        <div class="section-header">
+            {showHeader && title && <h2>{title}</h2>}
+            <div
+                class="nav-arrows"
+                style={!showHeader || !title ? "margin-left: auto;" : ""}
+            >
+                <button class="arrow-btn prev-btn" aria-label="Anterior">
+                    <ChevronLeft size={24} />
+                </button>
+                <button class="arrow-btn next-btn" aria-label="Siguiente">
+                    <ChevronRight size={24} />
+                </button>
+            </div>
+        </div>
+
+        <div class="project-carousel">
+            <div
+                class="project-grid"
+                style={`--visible-items: ${visibleItems}; --gap-size: ${gapSize}px;`}
+            >
+                {
+                    displayProjects.map((project) => (
+                        <ProjectCard proyecto={project} />
+                    ))
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .project-section {
+        margin-bottom: 60px;
+        width: 100%;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .section-header h2 {
+        font-size: 1.5rem;
+        color: var(--color-primary);
+        letter-spacing: 1px;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .nav-arrows {
+        display: flex;
+        gap: 12px;
+    }
+
+    .arrow-btn {
+        background: white;
+        border: 1px solid var(--color-border);
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--color-text);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        padding: 0;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .arrow-btn:hover:not(:disabled) {
+        background-color: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+        transform: translateY(-2px);
+    }
+
+    .arrow-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+
+    .project-carousel {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 20px;
+        margin-bottom: -10px;
+    }
+
+    .project-carousel::-webkit-scrollbar {
+        display: none;
+    }
+
+    .project-carousel.active {
+        cursor: grabbing;
+        cursor: -webkit-grabbing;
+        scroll-snap-type: none;
+        scroll-behavior: auto;
+    }
+
+    .project-grid {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: var(--gap-size, 30px);
+    }
+
+    .project-grid > :global(*) {
+        flex: 0 0
+            calc(
+                (
+                        100% -
+                            (
+                                var(--gap-size, 30px) *
+                                    (var(--visible-items, 2) - 1)
+                            )
+                    ) /
+                    var(--visible-items, 2)
+            );
+        min-width: 280px;
+        scroll-snap-align: start;
+    }
+
+    @media (max-width: 1100px) {
+        .project-grid > :global(*) {
+            flex: 0 0 calc((100% - (var(--gap-size, 30px) * 1)) / 2);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .project-grid > :global(*) {
+            flex: 0 0 100%;
+        }
+        .section-header h2 {
+            font-size: 1.25rem;
+        }
+    }
+</style>
+
+<script>
+    function initProjectCarousels() {
+        const carousels = document.querySelectorAll(".project-carousel");
+
+        carousels.forEach((carousel) => {
+            if (!(carousel instanceof HTMLElement)) return;
+            if (carousel.dataset.carouselInit === "true") return;
+            carousel.dataset.carouselInit = "true";
+
+            const section = carousel.closest(".project-section");
+            if (!section) return;
+
+            const prevBtn = section.querySelector(".prev-btn");
+            const nextBtn = section.querySelector(".next-btn");
+            const grid = carousel.querySelector(".project-grid");
+
+            if (
+                prevBtn instanceof HTMLButtonElement &&
+                nextBtn instanceof HTMLButtonElement &&
+                grid
+            ) {
+                const warp = () => {
+                    const third = carousel.scrollWidth / 3;
+                    if (carousel.scrollLeft >= third * 2) {
+                        carousel.style.scrollBehavior = "auto";
+                        carousel.scrollLeft -= third;
+                        carousel.style.scrollBehavior = "smooth";
+                    } else if (carousel.scrollLeft <= 5) {
+                        carousel.style.scrollBehavior = "auto";
+                        carousel.scrollLeft += third;
+                        carousel.style.scrollBehavior = "smooth";
+                    }
+                };
+
+                setTimeout(() => {
+                    carousel.scrollLeft = carousel.scrollWidth / 3;
+                }, 200);
+
+                nextBtn.addEventListener("click", () => {
+                    const item = grid.children[0];
+                    const step =
+                        item instanceof HTMLElement
+                            ? item.offsetWidth + 30
+                            : 400;
+                    carousel.scrollBy({ left: step, behavior: "smooth" });
+                });
+
+                prevBtn.addEventListener("click", () => {
+                    const item = grid.children[0];
+                    const step =
+                        item instanceof HTMLElement
+                            ? item.offsetWidth + 30
+                            : 400;
+                    carousel.scrollBy({ left: -step, behavior: "smooth" });
+                });
+
+                carousel.addEventListener("scroll", warp, { passive: true });
+
+                let isDown = false;
+                let startX = 0;
+                let startScrollLeft = 0;
+
+                carousel.addEventListener("mousedown", (e) => {
+                    isDown = true;
+                    carousel.classList.add("active");
+                    startX =
+                        /** @type {MouseEvent} */ (e).pageX -
+                        carousel.offsetLeft;
+                    startScrollLeft = carousel.scrollLeft;
+                });
+
+                const endDrag = () => {
+                    isDown = false;
+                    carousel.classList.remove("active");
+                };
+
+                carousel.addEventListener("mouseleave", endDrag);
+                carousel.addEventListener("mouseup", endDrag);
+
+                carousel.addEventListener("mousemove", (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x =
+                        /** @type {MouseEvent} */ (e).pageX -
+                        carousel.offsetLeft;
+                    const walk = (x - startX) * 2;
+                    carousel.scrollLeft = startScrollLeft - walk;
+                });
+
+                carousel.addEventListener(
+                    "touchstart",
+                    (e) => {
+                        isDown = true;
+                        startX =
+                            /** @type {TouchEvent} */ (e).touches[0].pageX -
+                            carousel.offsetLeft;
+                        startScrollLeft = carousel.scrollLeft;
+                    },
+                    { passive: true },
+                );
+
+                carousel.addEventListener(
+                    "touchmove",
+                    (e) => {
+                        if (!isDown) return;
+                        const x =
+                            /** @type {TouchEvent} */ (e).touches[0].pageX -
+                            carousel.offsetLeft;
+                        const walk = (x - startX) * 2;
+                        carousel.scrollLeft = startScrollLeft - walk;
+                    },
+                    { passive: true },
+                );
+
+                carousel.addEventListener("touchend", () => {
+                    isDown = false;
+                });
+            }
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initProjectCarousels);
+    } else {
+        initProjectCarousels();
+    }
+    document.addEventListener("astro:page-load", initProjectCarousels);
+    document.addEventListener("astro:after-swap", initProjectCarousels);
+</script>

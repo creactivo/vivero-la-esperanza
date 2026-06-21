@@ -1,0 +1,363 @@
+---
+import CartCounter from "./CartCounter";
+import AuthStatus from "./AuthStatus.tsx";
+import { ShoppingBag, Menu } from "lucide-react";
+---
+
+<header class="site-header">
+    <div class="header-top container">
+        <button class="mobile-nav-toggle" aria-label="Abrir menú">
+            <Menu size={24} />
+        </button>
+
+        <nav class="nav-left">
+            <a href="/">Inicio</a>
+            <a href="/nuestro-vivero">Nuestro Vivero</a>
+            <a href="/proyectos">Proyectos</a>
+        </nav>
+
+        <div class="logo-container">
+            <a href="/" class="logo-text">
+                <img
+                    src="../images/Logo-esperanza.png"
+                    alt="Logo Esperanza Vivero"
+                    class="logo-image"
+                    width="120"
+                    height="57"
+                />
+            </a>
+        </div>
+
+        <div class="nav-right">
+            <AuthStatus client:load />
+            <a
+                href="/carrito"
+                class="icon-link cart-icon-link"
+                aria-label="Carrito"
+            >
+                <ShoppingBag size={22} strokeWidth={1.5} />
+                <CartCounter client:load />
+            </a>
+        </div>
+    </div>
+
+    <div class="mobile-nav">
+        <nav>
+            <a href="/">Inicio</a>
+            <a href="/nuestro-vivero">Nuestro Vivero</a>
+            <a href="/proyectos">Proyectos</a>
+        </nav>
+    </div>
+</header>
+
+<script>
+    function updateHeaderScroll() {
+        const header = document.querySelector(".site-header");
+        if (header) {
+            if (window.scrollY > 50) {
+                header.classList.add("scrolled");
+            } else {
+                header.classList.remove("scrolled");
+            }
+        }
+    }
+
+    // Initialize header scroll state
+    function initHeader() {
+        updateHeaderScroll();
+        window.addEventListener("scroll", updateHeaderScroll);
+    }
+
+    // Initialize on page load
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initHeader);
+    } else {
+        initHeader();
+    }
+
+    // Re-initialize on Astro navigation
+    document.addEventListener("astro:page-load", initHeader);
+    document.addEventListener("astro:after-swap", initHeader);
+
+    // Mobile nav toggle
+    function initMobileNav() {
+        const mobileNavToggle = document.querySelector(".mobile-nav-toggle");
+        const header = document.querySelector(".site-header");
+        if (mobileNavToggle && header) {
+            mobileNavToggle.addEventListener("click", () => {
+                header.classList.toggle("nav-open");
+            });
+        }
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initMobileNav);
+    } else {
+        initMobileNav();
+    }
+
+    document.addEventListener("astro:page-load", initMobileNav);
+    document.addEventListener("astro:after-swap", initMobileNav);
+</script>
+
+<style>
+    /* Header Styles */
+    .site-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        padding: 10px 0;
+        background: transparent;
+        transition:
+            background-color 0.3s ease,
+            box-shadow 0.3s ease,
+            color 0.3s ease;
+    }
+
+    .site-header.scrolled {
+        background-color: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+    }
+
+    .nav-left a,
+    .nav-right a {
+        text-decoration: none;
+        color: var(--color-text);
+        margin: 0 15px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        transition: color 0.3s ease;
+    }
+    .nav-left a:hover,
+    .nav-right a:hover {
+        color: #00975d;
+        text-shadow: var(--shadow-md);
+    }
+
+    .nav-left {
+        flex: 1;
+    }
+
+    .nav-right {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        color: var(--color-text);
+    }
+
+    .logo-container {
+        text-align: center;
+    }
+
+    .logo-text {
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #4a235a;
+        transition: color 0.3s ease;
+    }
+    .logo-text img {
+        width: 120px;
+        height: auto;
+        transition:
+            transform 0.3s ease,
+            opacity 0.3s ease;
+    }
+    .site-header.scrolled .logo-text img {
+        /* Solo una sutil escala, sin cambiar dimensiones base */
+        transform: scale(1.02);
+    }
+
+
+    .cart-icon-link {
+        position: relative;
+    }
+
+    :global(.cart-count) {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background-color: rgb(0, 255, 133);
+        color: var(--color-primary-dark);
+        font-size: 12px;
+        font-weight: bold;
+        width: 20px;
+        height: 20px;
+        border-radius: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .mobile-nav-toggle {
+        display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        z-index: 1001;
+        color: var(--color-text);
+        transition: color 0.3s ease;
+    }
+
+    .mobile-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: var(--color-surface);
+        box-shadow: var(--shadow-md);
+        padding: 20px;
+    }
+
+    .mobile-nav nav {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .mobile-nav a {
+        text-decoration: none;
+        color: var(--color-text);
+        font-size: 1.2rem;
+        font-weight: 500;
+    }
+
+    .site-header.nav-open .mobile-nav {
+        display: block;
+    }
+
+    .auth-status-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .logout-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        color: var(--color-text);
+        margin: 0 15px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        transition: color 0.3s ease;
+        padding: 0;
+        font-family: inherit;
+    }
+
+    .logout-button:hover {
+        color: #00975d;
+        text-shadow: var(--shadow-md);
+    }
+
+    :global(.user-menu-details) {
+        position: relative;
+    }
+
+    :global(.user-info-trigger) {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        list-style: none; /* Remove default marker */
+    }
+    :global(.user-info-trigger::-webkit-details-marker) {
+        display: none; /* Remove default marker for Chrome */
+    }
+
+    :global(.user-identifier) {
+        font-size: 0.9rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: var(--color-text);
+    }
+
+    :global(.user-dropdown-menu) {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: var(--shadow-lg);
+        padding: 10px;
+        margin-top: 15px;
+        min-width: 180px;
+        z-index: 1001;
+        border: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    :global(.user-dropdown-menu .logout-button),
+    :global(.user-dropdown-menu .dropdown-link) {
+        width: 100%;
+        text-align: left;
+        padding: 8px 12px;
+        margin: 0;
+        border-radius: 6px;
+        transition: background-color 0.2s ease;
+    }
+    
+    :global(.user-dropdown-menu .dropdown-link) {
+        text-decoration: none;
+        color: var(--color-text);
+    }
+
+    :global(.user-dropdown-menu .logout-button:hover),
+    :global(.user-dropdown-menu .dropdown-link:hover) {
+        background-color: #f5f5f5;
+        color: #00975d;
+    }
+
+    .site-header.scrolled .mobile-nav-toggle,
+    .site-header.scrolled :global(.icon-link) {
+        color: var(--color-text);
+    }
+
+    @media (max-width: 768px) {
+        .nav-left {
+            display: none;
+        }
+
+        .mobile-nav-toggle {
+            display: block;
+        }
+
+        .header-top {
+            justify-content: space-between;
+        }
+
+        .nav-right {
+        }
+
+        .logo-container {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        :global(.user-email-text) {
+            display: none;
+        }
+    }
+</style>

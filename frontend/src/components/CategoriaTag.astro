@@ -1,0 +1,71 @@
+---
+interface Props {
+    nombre: string;
+    slug: string;
+    imagen: string;
+    descripcion: string;
+}
+
+const { nombre, slug, imagen, descripcion } = Astro.props;
+---
+
+<a href={`/categoria/${slug}`} class="categoria-card">
+    <div class="categoria-imagen">
+        <img src={imagen} alt={nombre} loading="lazy" />
+    </div>
+    <div class="categoria-contenido">
+        <h3>{nombre}</h3>
+        <p>{descripcion}</p>
+    </div>
+</a>
+
+<style>
+    .categoria-card {
+        display: block;
+        text-decoration: none;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        background: white;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+    }
+
+    .categoria-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .categoria-imagen {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .categoria-imagen img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .categoria-card:hover .categoria-imagen img {
+        transform: scale(1.05);
+    }
+
+    .categoria-contenido {
+        padding: var(--space-4);
+    }
+
+    .categoria-contenido h3 {
+        margin: 0 0 var(--space-2);
+        font-size: var(--text-lg);
+        color: var(--color-gray-900);
+    }
+
+    .categoria-contenido p {
+        margin: 0;
+        font-size: var(--text-sm);
+        color: var(--color-gray-600);
+        line-height: 1.5;
+    }
+</style>

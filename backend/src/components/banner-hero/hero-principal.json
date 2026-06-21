@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_banner_hero_hero_principals",
+  "info": {
+    "displayName": "hero-principal"
+  },
+  "options": {},
+  "attributes": {
+    "imagenbanner": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "files",
+        "images"
+      ]
+    },
+    "heading": {
+      "type": "string"
+    },
+    "subheading": {
+      "type": "text"
+    }
+  },
+  "config": {}
+}

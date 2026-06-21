@@ -1,0 +1,162 @@
+---
+import type { Producto } from "../lib/strapi";
+import { getImageUrl } from "../lib/strapi";
+import { Heart } from "lucide-react";
+
+interface Props {
+    producto: Producto;
+}
+
+const { producto } = Astro.props;
+
+if (!producto?.slug) {
+    return null;
+}
+
+const { nombre, precio, stock, slug, imagenes } = producto;
+
+const imageUrl = imagenes?.[0]
+    ? getImageUrl(imagenes[0].url)
+    : "/images/Jardin-2.jpg";
+---
+
+<article class="product-card">
+    <div class="card-badges">
+        <span class="badge-new">NUEVO</span>
+    </div>
+
+    <a href={`/producto/${slug}`} class="block img-link">
+        <div class="image-wrapper">
+            <img
+                src={imageUrl}
+                alt={nombre}
+                loading="lazy"
+                data-product-slug={slug}
+            />
+        </div>
+    </a>
+
+    <div class="card-content">
+        <div class="product-info-col">
+            <h3 class="product-title">
+                <a href={`/producto/${slug}`}>{nombre}</a>
+            </h3>
+            <div class="rating">
+                {
+                    Array(5)
+                        .fill(0)
+                        .map((_) => (
+                            <Heart size={14} fill="#00FF85" color="#00FF85" />
+                        ))
+                }
+            </div>
+        </div>
+
+        <div class="product-details-col">
+            <div class="stock-info">
+                {stock > 0 ? `${stock} disp.` : "Agotado"}
+            </div>
+            <div class="product-price">
+                ${precio.toLocaleString("es-CO")}
+            </div>
+             <a
+            href={`/producto/${slug}`}
+            class="btn btn-primary btn-sm btn-order product-button-col"
+        >
+            Ver Más
+        </a>
+        </div>
+    </div>
+</article>
+
+<style>
+    .product-card {
+        background: white;
+        padding: 20px;
+        position: relative;
+        transition: all 0.3s ease;
+        /* Sin bordes ni sombras por defecto para look limpio */
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-badges {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 2;
+    }
+
+    .badge-new {
+        background: #00ff9d; /* Verde neón brillante de la imagen */
+        color: #3a5a40;
+        font-size: 0.6rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 16px;
+        text-transform: uppercase;
+    }
+
+    .image-wrapper {
+        aspect-ratio: 1;
+        overflow: hidden;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* Para que la planta se vea completa sin recorte */
+        transition: transform 0.5s ease;
+    }
+
+    .product-card:hover img {
+        transform: scale(1.05);
+    }
+
+    .rating {
+        font-size: 0.8rem;
+        margin-bottom: 10px;
+        letter-spacing: 2px;
+        display: flex;
+        justify-content: left;
+        gap: 4px;
+    }
+
+    .product-title {
+        font-size: 1rem;
+        margin-bottom: 10px;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    .product-title a {
+        text-decoration: none;
+        color: var(--color-primary);
+    }
+
+    .product-price {
+        font-size: 0.9rem;
+        color: var(--color-text-light);
+        margin-bottom: 15px;
+        font-weight: 500;
+    }
+
+    .btn-order {
+        background-color: #2d4633; /* Verde muy oscuro */
+        color: white;
+        padding: 8px 20px;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        border-radius: 16px; /* Botón píldora */
+    }
+
+    .btn-order:hover {
+        background-color: var(--color-primary);
+    }
+</style>

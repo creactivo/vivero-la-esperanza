@@ -1,0 +1,24 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Reglas para la colección 'ordenes'
+    match /ordenes/{ordenId} {
+      // Un usuario solo puede leer sus propias órdenes
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      // Un usuario solo puede crear una orden si está autenticado
+      // y si el userId que envía coincide con su propio ID de usuario
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      
+      // No permitimos actualizar ni eliminar órdenes desde el frontend por seguridad
+      allow update, delete: if false;
+    }
+    
+    // Bloquear el acceso a cualquier otra colección por defecto
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

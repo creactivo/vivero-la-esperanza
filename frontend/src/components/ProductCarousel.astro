@@ -1,0 +1,249 @@
+---
+import ProductCard from "./ProductCard.astro";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { Producto } from "../lib/strapi";
+
+interface Props {
+    title: string;
+    products: Producto[];
+}
+
+const { title, products } = Astro.props;
+---
+
+<section class="product-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>{title}</h2>
+            <div class="nav-arrows">
+                <button class="arrow-btn prev-btn" aria-label="Anterior"><ChevronLeft size={24} /></button>
+                <button class="arrow-btn next-btn" aria-label="Siguiente"><ChevronRight size={24} /></button>
+            </div>
+        </div>
+        <div class="product-carousel">
+            <div class="product-grid">
+                {
+                    products.map((product) => (
+                        <ProductCard producto={product} />
+                    ))
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .product-section {
+        margin-bottom: 60px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .section-header h2 {
+        font-size: 1.5rem;
+        color: var(--color-primary);
+        letter-spacing: 1px;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    .nav-arrows {
+        display: flex;
+        gap: 10px;
+    }
+
+    .arrow-btn {
+        background: transparent;
+        border: 1px solid var(--color-border);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--color-text);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .arrow-btn:hover {
+        background-color: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+    }
+
+    .arrow-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .product-carousel {
+        /* The carousel is the viewport */
+        width: 100%;
+
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+
+        /* Optional but helps UX */
+        scroll-snap-type: x mandatory;
+    }
+
+    .product-grid {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 30px;
+        width: 100%;
+    }
+
+    /* Make exactly 4 items fit in the viewport (minus 3 gaps). */
+    .product-grid > :global(*) {
+        flex: 0 0 calc((100% - (30px * 3)) / 4);
+        min-width: 220px;
+        scroll-snap-align: start;
+    }
+
+    @media (max-width: 1100px) {
+        /* 3 items */
+        .product-grid > :global(*) {
+            flex-basis: calc((100% - (30px * 2)) / 3);
+        }
+    }
+
+    @media (max-width: 850px) {
+        /* 2 items */
+        .product-grid > :global(*) {
+            flex-basis: calc((100% - (30px * 1)) / 2);
+        }
+    }
+
+    @media (max-width: 560px) {
+        .product-grid {
+            gap: 16px;
+        }
+        /* 2 items on mobile */
+        .product-grid > :global(*) {
+            flex-basis: calc((100% - 16px) / 2);
+            min-width: 200px;
+            padding: 10px;
+        }
+    }
+
+    .product-carousel::-webkit-scrollbar {
+        display: none; /* Safari and Chrome */
+    }
+</style>
+
+<script>
+const SCROLL_AMOUNT = 300;
+
+function initProductCarousels() {
+    const carousels = document.querySelectorAll('.product-carousel');
+
+    carousels.forEach((carouselEl) => {
+        const carousel = carouselEl as HTMLElement;
+        // Make init idempotent (Astro can swap pages client-side).
+        if (carousel.dataset.carouselInit === 'true') return;
+        carousel.dataset.carouselInit = 'true';
+
+        const section = carousel.closest('.product-section');
+        if (!section) return;
+
+        const prevBtn = section.querySelector('.prev-btn');
+        const nextBtn = section.querySelector('.next-btn');
+        if (!(prevBtn instanceof HTMLButtonElement) || !(nextBtn instanceof HTMLButtonElement)) return;
+
+        // If there are no items, disable navigation and skip listeners.
+        const grid = carousel.querySelector('.product-grid');
+        if (!grid || grid.children.length === 0) {
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            return;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            carousel.scrollLeft += SCROLL_AMOUNT;
+        });
+
+        prevBtn.addEventListener('click', () => {
+            carousel.scrollLeft -= SCROLL_AMOUNT;
+        });
+
+        let isDown = false;
+        let startX = 0;
+        let startScrollLeft = 0;
+
+        carousel.addEventListener('mousedown', (e: Event) => {
+            const me = e as MouseEvent;
+            isDown = true;
+            carousel.classList.add('active');
+            startX = me.pageX - carousel.offsetLeft;
+            startScrollLeft = carousel.scrollLeft;
+        });
+
+        const endDrag = () => {
+            isDown = false;
+            carousel.classList.remove('active');
+        };
+
+        carousel.addEventListener('mouseleave', endDrag);
+        carousel.addEventListener('mouseup', endDrag);
+
+        carousel.addEventListener('mousemove', (e: Event) => {
+            const me = e as MouseEvent;
+            if (!isDown) return;
+            me.preventDefault();
+            const x = me.pageX - carousel.offsetLeft;
+            const walk = (x - startX) * 2;
+            carousel.scrollLeft = startScrollLeft - walk;
+        });
+
+        // Touch events for mobile
+        carousel.addEventListener(
+            'touchstart',
+            (e: Event) => {
+                const te = e as TouchEvent;
+                isDown = true;
+                startX = te.touches[0].pageX - carousel.offsetLeft;
+                startScrollLeft = carousel.scrollLeft;
+            },
+            { passive: true }
+        );
+
+        carousel.addEventListener(
+            'touchmove',
+            (e: Event) => {
+                const te = e as TouchEvent;
+                if (!isDown) return;
+                const x = te.touches[0].pageX - carousel.offsetLeft;
+                const walk = (x - startX) * 2;
+                carousel.scrollLeft = startScrollLeft - walk;
+            },
+            { passive: true }
+        );
+
+        carousel.addEventListener('touchend', () => {
+            isDown = false;
+        });
+    });
+}
+
+// Initialize on multiple events to ensure it works
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProductCarousels);
+} else {
+    // DOM is already ready
+    initProductCarousels();
+}
+
+// Also listen to Astro navigation events
+document.addEventListener('astro:page-load', initProductCarousels);
+document.addEventListener('astro:after-swap', initProductCarousels);
+</script>

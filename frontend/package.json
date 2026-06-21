@@ -1,0 +1,32 @@
+{
+  "name": "frontend",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@astrojs/react": "^5.0.7",
+    "@emailjs/browser": "^4.4.1",
+    "astro": "^6.4.8",
+    "axios": "^1.13.2",
+    "firebase": "^12.7.0",
+    "lucide-react": "^0.561.0",
+    "marked": "^17.0.1",
+    "qs": "^6.15.2",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "simple-icons": "^16.23.0",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@astrojs/node": "^10.1.4",
+    "@types/qs": "^6.15.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3"
+  }
+}
