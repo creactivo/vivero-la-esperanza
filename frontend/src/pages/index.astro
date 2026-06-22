@@ -191,7 +191,7 @@ const carruseles = Array.from(productosPorCategoria.entries());
             "#list-view-content .product-wrapper",
         );
 
-                const savedView = localStorage.getItem("homeView") === "list" ? "list" : "grid";
+                        const savedView = localStorage.getItem("homeView") === "list" ? "list" : "grid";
 
         /** @param {'grid' | 'list'} view */
         function updateTransitionNames(view) {
@@ -218,7 +218,7 @@ const carruseles = Array.from(productosPorCategoria.entries());
             });
         }
 
-        /** @param {'grid' | 'list'} view */
+                /** @param {'grid' | 'list'} view */
         function applyView(view) {
             if (view === "list") {
                 if (gridViewContent) gridViewContent.style.display = "none";
