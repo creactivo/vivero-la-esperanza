@@ -15,20 +15,22 @@
     "upgrade:dry": "npx @strapi/upgrade latest --dry"
   },
   "dependencies": {
-    "@strapi/plugin-cloud": "5.33.0",
-    "@strapi/plugin-users-permissions": "5.33.0",
-    "@strapi/strapi": "5.33.0",
+    "@strapi/plugin-cloud": "5.48.1",
+    "@strapi/plugin-users-permissions": "5.48.1",
+    "@strapi/strapi": "5.48.1",
     "better-sqlite3": "12.5.0",
+    "pg": "8.12.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-redux": "^8.1.3",
-    "react-router-dom": "^6.0.0",
-    "styled-components": "^6.1.19"
+    "@reduxjs/toolkit": "^1.9.5",
+    "react-router-dom": "^6.30.3",
+    "styled-components": "6.1.19"
   },
   "devDependencies": {
     "@types/node": "^26.0.0",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "^18.0.0",
     "axios": "^1.18.0",
     "typescript": "^6.0.3"
   },
@@ -39,10 +41,5 @@
   "strapi": {
     "uuid": "ab37e8ee-0945-489e-9193-210006740cd9",
     "installId": "30f65a39a74caab2c717ceef1c7fffda48797886e58173414686881c3a2850a5"
-  },
-  "pnpm": {
-    "overrides": {
-      "react-redux": "^8.0.0"
-    }
   }
 }
