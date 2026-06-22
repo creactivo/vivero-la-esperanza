@@ -191,8 +191,9 @@ const carruseles = Array.from(productosPorCategoria.entries());
             "#list-view-content .product-wrapper",
         );
 
-        const savedView = localStorage.getItem("homeView") || "grid";
+                const savedView = localStorage.getItem("homeView") === "list" ? "list" : "grid";
 
+        /** @param {'grid' | 'list'} view */
         function updateTransitionNames(view) {
             const images = document.querySelectorAll("img[data-product-slug]");
             images.forEach((el) => {
@@ -217,6 +218,7 @@ const carruseles = Array.from(productosPorCategoria.entries());
             });
         }
 
+        /** @param {'grid' | 'list'} view */
         function applyView(view) {
             if (view === "list") {
                 if (gridViewContent) gridViewContent.style.display = "none";
