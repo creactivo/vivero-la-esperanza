@@ -12,11 +12,7 @@ overrides:
 
 importers:
 
-  .:
-    devDependencies:
-      '@astrojs/node':
-        specifier: ^10.1.4
-        version: 10.1.4(astro@6.4.8(@types/node@26.0.0)(@vercel/functions@3.7.2(ws@8.21.0))(rollup@4.62.2)(terser@5.48.0)(yaml@2.9.0))
+  .: {}
 
   backend:
     dependencies:
