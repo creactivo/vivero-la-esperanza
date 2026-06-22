@@ -40,5 +40,8 @@
   "strapi": {
     "uuid": "ab37e8ee-0945-489e-9193-210006740cd9",
     "installId": "30f65a39a74caab2c717ceef1c7fffda48797886e58173414686881c3a2850a5"
+  },
+  "overrides": {
+    "@types/react": "18.3.3"
   }
 }
