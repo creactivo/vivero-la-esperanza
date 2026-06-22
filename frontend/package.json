@@ -22,7 +22,8 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "simple-icons": "^16.23.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@astrojs/node": "^10.1.4",
