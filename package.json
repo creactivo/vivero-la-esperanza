@@ -1,11 +1,9 @@
 {
-  "name": "vivero-la-esperanza-root",
-  "private": true,
   "packageManager": "pnpm@11.3.0",
   "engines": {
     "node": ">=22.0.0"
   },
   "overrides": {
-    "zod": "latest"
+    "zod": "3.24.2"
   }
 }
