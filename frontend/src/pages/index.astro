@@ -2,7 +2,12 @@
 import Layout from "../layouts/Layout.astro";
 import ProductCarousel from "../components/ProductCarousel.astro";
 import ProductCard from "../components/ProductCard.astro"; // Importar ProductCard
-import { getProductos, getCategorias, getSectionsPage, getImageUrl } from "../lib/strapi";
+import {
+    getProductos,
+    getCategorias,
+    getSectionsPage,
+    getImageUrl,
+} from "../lib/strapi";
 import type { Producto } from "../lib/strapi";
 
 import { Leaf, Gift, Sprout, Scissors, Grid, List } from "lucide-react"; // Importar Grid y List
@@ -11,15 +16,19 @@ import { Leaf, Gift, Sprout, Scissors, Grid, List } from "lucide-react"; // Impo
 const [productos, categorias, sectionsPage] = await Promise.all([
     getProductos(),
     getCategorias(),
-    getSectionsPage()
+    getSectionsPage(),
 ]);
 
 // Extraer datos del hero dinámico
 const heroData = sectionsPage?.componente;
-const heroBgImage = heroData?.imagenbanner?.[0] ? getImageUrl(heroData.imagenbanner[0].url) : "/images/bg-hero-b.jpg";
+const heroBgImage = heroData?.imagenbanner?.[0]
+    ? getImageUrl(heroData.imagenbanner[0].url)
+    : "/images/bg-hero-b.jpg";
 const heroTitle = heroData?.heading || "CATALOGO";
 const heroSubtitle = sectionsPage?.title || "BIENVENIDO A NUESTRO";
-const heroDesc = heroData?.subheading || "Descubre nuestra amplia variedad de plantas ornamentales, frutales y forestales. Cultivadas con amor para darle vida a tus espacios.";
+const heroDesc =
+    heroData?.subheading ||
+    "Descubre nuestra amplia variedad de plantas ornamentales, frutales y forestales. Cultivadas con amor para darle vida a tus espacios.";
 
 // 2. Agrupar productos por categoría para los carruseles
 const productosPorCategoria = new Map<string, Producto[]>();
@@ -38,51 +47,62 @@ for (const producto of productos) {
 const carruseles = Array.from(productosPorCategoria.entries());
 ---
 
+//Cambio para hacer una gran pagina
 <Layout title="Inicio">
-	<!-- Hero / Catálogo Header -->
-	<section class="hero-section" style={`background-image: url('${heroBgImage}');`}>
-		<div class="container text-center">
-			<span class="hero-subtitle">{heroSubtitle}</span>
-			<h1 class="hero-title">{heroTitle}</h1>
-			<p class="hero-desc">
-				{heroDesc}
-			</p>
+    <!-- Hero / Catálogo Header -->
+    <section
+        class="hero-section"
+        style={`background-image: url('${heroBgImage}');`}
+    >
+        <div class="container text-center">
+            <span class="hero-subtitle">{heroSubtitle}</span>
+            <h1 class="hero-title">{heroTitle}</h1>
+            <p class="hero-desc">
+                {heroDesc}
+            </p>
 
-			<!-- Buscador -->
-			<div class="search-container">
-				<form action="/" method="get" class="search-form">
-					<input
-						type="text"
-						name="q"
-						placeholder="Buscar..."
-						class="search-input"
-					/>
-					<button type="submit" class="search-btn">BUSCAR</button>
-				</form>
-			</div>
-		</div>
-	</section>
+            <!-- Buscador -->
+            <div class="search-container">
+                <form action="/" method="get" class="search-form">
+                    <input
+                        type="text"
+                        name="q"
+                        placeholder="Buscar..."
+                        class="search-input"
+                    />
+                    <button type="submit" class="search-btn">BUSCAR</button>
+                </form>
+            </div>
+        </div>
+    </section>
 
-	<!-- Filtros Rápidos (Categorías Dinámicas) -->
-	<section class="quick-filters container">
-		<div class="filter-grid">
-			{categorias.slice(0, 4).map((categoria, index) => {
-				const icons = [
-					<Leaf color="#3A5A40" size={24} />,
-					<Gift color="#3A5A40" size={24} />,
-					<Sprout color="#3A5A40" size={24} />,
-					<Scissors color="#3A5A40" size={24} />
-				];
-				return (
-					<a href={`/categoria/${categoria.slug}`} class="filter-item">
-						<span class="badg-disc">NUEVO</span>
-						<span class="icon">{icons[index % icons.length]}</span>
-						<span>{categoria.nombre}</span>
-					</a>
-				)
-			})}
-		</div>
-	</section>
+    <!-- Filtros Rápidos (Categorías Dinámicas) -->
+    <section class="quick-filters container">
+        <div class="filter-grid">
+            {
+                categorias.slice(0, 4).map((categoria, index) => {
+                    const icons = [
+                        <Leaf color="#3A5A40" size={24} />,
+                        <Gift color="#3A5A40" size={24} />,
+                        <Sprout color="#3A5A40" size={24} />,
+                        <Scissors color="#3A5A40" size={24} />,
+                    ];
+                    return (
+                        <a
+                            href={`/categoria/${categoria.slug}`}
+                            class="filter-item"
+                        >
+                            <span class="badg-disc">NUEVO</span>
+                            <span class="icon">
+                                {icons[index % icons.length]}
+                            </span>
+                            <span>{categoria.nombre}</span>
+                        </a>
+                    );
+                })
+            }
+        </div>
+    </section>
 
     <div class="container">
         <div class="products-header">
@@ -102,40 +122,59 @@ const carruseles = Array.from(productosPorCategoria.entries());
         </div>
     </div>
 
-	<!-- Contenedor principal para la vista de productos -->
+    <!-- Contenedor principal para la vista de productos -->
     <div id="products-container">
         <!-- Vista de Grid (Carruseles) -->
         <div id="grid-view-content">
-            {carruseles.map(([nombreCategoria, productosDeCategoria], index) => (
-                <>
-                    <ProductCarousel title={nombreCategoria} products={productosDeCategoria} />
-                    {index === 1 && (
-                        <section class="promo-banner">
-                            <div class="container banner-content">
-                                <div class="banner-text">
-                                    <span class="promo-badge">NUEVO</span>
-                                    <h2>COLECCIÓN SUCULENTAS</h2>
-                                    <p>
-                                        Descubre nuestra nueva selección de suculentas exóticas. 
-                                        Fáciles de cuidar, hermosas y perfectas para espacios interiores.
-                                    </p>
-                                    <a href="/" class="btn btn-primary">QUIERO COMPRAR</a>
-                                </div>
-                            </div>
-                        </section>
-                    )}
-                </>
-            ))}
+            {
+                carruseles.map(
+                    ([nombreCategoria, productosDeCategoria], index) => (
+                        <>
+                            <ProductCarousel
+                                title={nombreCategoria}
+                                products={productosDeCategoria}
+                            />
+                            {index === 1 && (
+                                <section class="promo-banner">
+                                    <div class="container banner-content">
+                                        <div class="banner-text">
+                                            <span class="promo-badge">
+                                                NUEVO
+                                            </span>
+                                            <h2>COLECCIÓN SUCULENTAS</h2>
+                                            <p>
+                                                Descubre nuestra nueva selección
+                                                de suculentas exóticas. Fáciles
+                                                de cuidar, hermosas y perfectas
+                                                para espacios interiores.
+                                            </p>
+                                            <a href="/" class="btn btn-primary">
+                                                QUIERO COMPRAR
+                                            </a>
+                                        </div>
+                                    </div>
+                                </section>
+                            )}
+                        </>
+                    ),
+                )
+            }
         </div>
 
         <!-- Vista de Lista (Simple) -->
         <div id="list-view-content" class="container" style="display: none;">
-             <div class="list-view">
-                {productos.map(producto => (
-                    <div class="product-wrapper" data-category={producto.categoria?.slug} data-name={producto.nombre.toLowerCase()}>
-                        <ProductCard producto={producto} />
-                    </div>
-                ))}
+            <div class="list-view">
+                {
+                    productos.map((producto) => (
+                        <div
+                            class="product-wrapper"
+                            data-category={producto.categoria?.slug}
+                            data-name={producto.nombre.toLowerCase()}
+                        >
+                            <ProductCard producto={producto} />
+                        </div>
+                    ))
+                }
             </div>
         </div>
     </div>
@@ -148,41 +187,47 @@ const carruseles = Array.from(productosPorCategoria.entries());
         const gridViewContent = document.getElementById("grid-view-content");
         const listViewContent = document.getElementById("list-view-content");
         const searchInput = document.querySelector(".search-input");
-        const productWrappers = document.querySelectorAll("#list-view-content .product-wrapper");
+        const productWrappers = document.querySelectorAll(
+            "#list-view-content .product-wrapper",
+        );
 
-        const savedView = localStorage.getItem('homeView') || 'grid';
+        const savedView = localStorage.getItem("homeView") || "grid";
 
         function updateTransitionNames(view) {
-            const images = document.querySelectorAll('img[data-product-slug]');
-            images.forEach(el => {
+            const images = document.querySelectorAll("img[data-product-slug]");
+            images.forEach((el) => {
                 const img = /** @type {HTMLElement} */ (el);
-                const slug = img.getAttribute('data-product-slug');
+                const slug = img.getAttribute("data-product-slug");
                 if (!slug) return;
 
                 // Determinar si esta imagen está dentro de la vista activa
-                const isInActiveView = (view === 'list')
-                    ? img.closest('#list-view-content') !== null
-                    : img.closest('#grid-view-content') !== null;
+                const isInActiveView =
+                    view === "list"
+                        ? img.closest("#list-view-content") !== null
+                        : img.closest("#grid-view-content") !== null;
 
                 if (isInActiveView) {
-                    img.style.setProperty('view-transition-name', `image-${slug}`);
+                    img.style.setProperty(
+                        "view-transition-name",
+                        `image-${slug}`,
+                    );
                 } else {
-                    img.style.removeProperty('view-transition-name');
+                    img.style.removeProperty("view-transition-name");
                 }
             });
         }
 
         function applyView(view) {
-            if (view === 'list') {
-                if(gridViewContent) gridViewContent.style.display = 'none';
-                if(listViewContent) listViewContent.style.display = 'block';
-                if(listViewBtn) listViewBtn.classList.add("active");
-                if(gridViewBtn) gridViewBtn.classList.remove("active");
+            if (view === "list") {
+                if (gridViewContent) gridViewContent.style.display = "none";
+                if (listViewContent) listViewContent.style.display = "block";
+                if (listViewBtn) listViewBtn.classList.add("active");
+                if (gridViewBtn) gridViewBtn.classList.remove("active");
             } else {
-                if(gridViewContent) gridViewContent.style.display = 'block';
-                if(listViewContent) listViewContent.style.display = 'none';
-                if(gridViewBtn) gridViewBtn.classList.add("active");
-                if(listViewBtn) listViewBtn.classList.remove("active");
+                if (gridViewContent) gridViewContent.style.display = "block";
+                if (listViewContent) listViewContent.style.display = "none";
+                if (gridViewBtn) gridViewBtn.classList.add("active");
+                if (listViewBtn) listViewBtn.classList.remove("active");
             }
             updateTransitionNames(view);
         }
@@ -190,39 +235,39 @@ const carruseles = Array.from(productosPorCategoria.entries());
         /** @param {string} searchTerm */
         function filterProducts(searchTerm) {
             const term = searchTerm.toLowerCase();
-            productWrappers.forEach(wrapper => {
+            productWrappers.forEach((wrapper) => {
                 const el = /** @type {HTMLElement} */ (wrapper);
-                const name = el.dataset.name || '';
+                const name = el.dataset.name || "";
                 if (name.includes(term)) {
-                    el.style.display = 'block';
+                    el.style.display = "block";
                 } else {
-                    el.style.display = 'none';
+                    el.style.display = "none";
                 }
             });
         }
 
         applyView(savedView);
 
-        if(gridViewBtn) {
+        if (gridViewBtn) {
             gridViewBtn.addEventListener("click", () => {
-                applyView('grid');
-                localStorage.setItem('homeView', 'grid');
+                applyView("grid");
+                localStorage.setItem("homeView", "grid");
             });
         }
 
-        if(listViewBtn) {
+        if (listViewBtn) {
             listViewBtn.addEventListener("click", () => {
-                applyView('list');
-                localStorage.setItem('homeView', 'list');
+                applyView("list");
+                localStorage.setItem("homeView", "list");
             });
         }
 
-        if(searchInput) {
-            searchInput.addEventListener('input', (e) => {
+        if (searchInput) {
+            searchInput.addEventListener("input", (e) => {
                 const input = /** @type {HTMLInputElement} */ (e.target);
                 const searchTerm = input.value;
                 if (searchTerm.length > 0) {
-                    applyView('list'); // Forzar vista de lista al buscar
+                    applyView("list"); // Forzar vista de lista al buscar
                 }
                 filterProducts(searchTerm);
             });
@@ -234,155 +279,155 @@ const carruseles = Array.from(productosPorCategoria.entries());
 </script>
 
 <style>
-	/* Hero Section Overrides */
-	.hero-section {
-		padding-bottom: 100px; /* Top padding to account for fixed header */
-		background-image: url("/images/bg-hero-b.jpg");
-	}
+    /* Hero Section Overrides */
+    .hero-section {
+        padding-bottom: 100px; /* Top padding to account for fixed header */
+        background-image: url("/images/bg-hero-b.jpg");
+    }
 
-	.hero-desc {
-		max-width: 600px;
-	}
+    .hero-desc {
+        max-width: 600px;
+    }
 
-	/* Buscador */
-	.search-container {
-		position: absolute;
-		bottom: 0;
-		left: 50%;
-		transform: translate(
-			-50%,
-			50%
-		); /* Moves it down 50% of its own height to overlap */
-		width: 90%;
-		max-width: 600px;
-		z-index: 20;
-	}
+    /* Buscador */
+    .search-container {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translate(
+            -50%,
+            50%
+        ); /* Moves it down 50% of its own height to overlap */
+        width: 90%;
+        max-width: 600px;
+        z-index: 20;
+    }
 
-	.search-form {
-		display: flex;
-		background: white;
-		border-radius: var(--radius-full);
-		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-		padding: 5px;
-		border: 1px solid #eee;
-	}
+    .search-form {
+        display: flex;
+        background: white;
+        border-radius: var(--radius-full);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        padding: 5px;
+        border: 1px solid #eee;
+    }
 
-	.search-input {
-		flex: 1;
-		border: none;
-		padding: 15px 25px;
-		border-radius: var(--radius-full);
-		outline: none;
-	}
+    .search-input {
+        flex: 1;
+        border: none;
+        padding: 15px 25px;
+        border-radius: var(--radius-full);
+        outline: none;
+    }
 
-	.search-btn {
-		background-color: var(--color-primary-dark);
-		color: white;
-		border: none;
-		padding: 10px 30px;
-		border-radius: 9999px;
-		font-weight: 500;
-		letter-spacing: 1px;
-		cursor: pointer;
-		transition: background-color 0.3s;
-	}
+    .search-btn {
+        background-color: var(--color-primary-dark);
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 9999px;
+        font-weight: 500;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
 
-	.search-btn:hover {
-		background-color: var(--color-primary);
-	}
+    .search-btn:hover {
+        background-color: var(--color-primary);
+    }
 
-	/* Filtros Rápidos */
-	.quick-filters {
-		margin-top: 100px; /* Space for the floating search bar */
-		margin-bottom: 60px;
-	}
+    /* Filtros Rápidos */
+    .quick-filters {
+        margin-top: 100px; /* Space for the floating search bar */
+        margin-bottom: 60px;
+    }
 
-	.filter-grid {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 20px;
-	}
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
 
-	.filter-item {
-		background: #e8f1e9; /* Fondo gris verdoso suave */
-		padding: 20px;
-		border-radius: var(--radius-md);
-		display: flex;
-		align-items: center;
-		gap: 15px;
-		position: relative;
-		cursor: pointer;
-		transition: transform 0.3s;
-		text-decoration: none;
-		color: inherit;
-	}
+    .filter-item {
+        background: #e8f1e9; /* Fondo gris verdoso suave */
+        padding: 20px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.3s;
+        text-decoration: none;
+        color: inherit;
+    }
 
-	.filter-item:hover {
-		transform: translateY(-5px);
-	}
+    .filter-item:hover {
+        transform: translateY(-5px);
+    }
 
-	.badg-disc {
-		position: absolute;
-		top: -10px;
-		left: 10px;
-		background: #00c896; /* Verde chillón oferta */
-		border-radius: 10px;
-		color: white;
-		font-size: 0.6rem;
-		font-weight: 500;
-		line-height: 0.4rem;
-		padding: 6px 8px;
-		position: absolute;
-	}
+    .badg-disc {
+        position: absolute;
+        top: -10px;
+        left: 10px;
+        background: #00c896; /* Verde chillón oferta */
+        border-radius: 10px;
+        color: white;
+        font-size: 0.6rem;
+        font-weight: 500;
+        line-height: 0.4rem;
+        padding: 6px 8px;
+        position: absolute;
+    }
 
-	.icon {
-		font-size: 1.5rem;
-	}
+    .icon {
+        font-size: 1.5rem;
+    }
 
-	/* Banner Promocional */
-	.promo-banner {
-		background:
-			linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
-			url("/banner-bg.jpg");
-		background-size: cover;
-		background-position: center;
-		background-attachment: fixed;
-		padding: 80px 0;
-		margin-bottom: 60px;
-		position: relative;
-		overflow: hidden;
-	}
+    /* Banner Promocional */
+    .promo-banner {
+        background:
+            linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
+            url("/banner-bg.jpg");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        padding: 80px 0;
+        margin-bottom: 60px;
+        position: relative;
+        overflow: hidden;
+    }
 
-	.banner-content {
-		position: relative;
-		z-index: 2;
-	}
+    .banner-content {
+        position: relative;
+        z-index: 2;
+    }
 
-	.promo-badge {
-		background: #00c896;
-		color: white;
-		padding: 5px 10px;
-		font-size: 0.7rem;
-		font-weight: 500;
-		border-radius: 4px;
-		margin-bottom: 15px;
-		display: inline-block;
-	}
+    .promo-badge {
+        background: #00c896;
+        color: white;
+        padding: 5px 10px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        display: inline-block;
+    }
 
-	.banner-text {
-		max-width: 500px;
-	}
+    .banner-text {
+        max-width: 500px;
+    }
 
-	.banner-text h2 {
-		font-size: 2.5rem;
-		margin-bottom: 20px;
-		color: var(--color-primary-dark);
-	}
+    .banner-text h2 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: var(--color-primary-dark);
+    }
 
-	.banner-text p {
-		margin-bottom: 30px;
-		color: var(--color-text-light);
-	}
+    .banner-text p {
+        margin-bottom: 30px;
+        color: var(--color-text-light);
+    }
 
     .products-header {
         margin-bottom: var(--space-6);
@@ -470,7 +515,9 @@ const carruseles = Array.from(productosPorCategoria.entries());
         justify-content: flex-start;
     }
 
-    .list-view > .product-wrapper > :global(.product-card .product-details-col) {
+    .list-view
+        > .product-wrapper
+        > :global(.product-card .product-details-col) {
         display: flex;
         flex-direction: column; /* Apilar precio y stock */
         align-items: flex-end; /* Alinear a la derecha */
@@ -491,18 +538,17 @@ const carruseles = Array.from(productosPorCategoria.entries());
         margin-bottom: 0;
     }
 
-
     .list-view > .product-wrapper > :global(.product-card .card-badges) {
         top: 10px;
         left: 10px;
     }
 
-	@media (max-width: 768px) {
-		.filter-grid {
-			grid-template-columns: 1fr 1fr;
-		}
-		.hero-title {
-			font-size: 2.5rem;
-		}
-	}
+    @media (max-width: 768px) {
+        .filter-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+        .hero-title {
+            font-size: 2.5rem;
+        }
+    }
 </style>
