@@ -11,6 +11,6 @@
     "backend"
   ],
   "devDependencies": {
-    "vercel-ignore": "^2.0.0"
+    "vercel-ignore": "^1.0.0"
   }
 }
