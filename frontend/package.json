@@ -9,25 +9,45 @@
     "astro": "astro"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@astrojs/check": "^0.8.2",
     "@astrojs/react": "^6.0.0",
     "@astrojs/vercel": "^11.0.0",
     "@emailjs/browser": "^4.4.1",
     "astro": "^6.3.1",
+=======
+    "@astrojs/check": "^0.9.9",
+    "@astrojs/react": "^3.6.0",
+    "@astrojs/vercel": "^7.7.2",
+    "@emailjs/browser": "^4.4.1",
+    "astro": "^4.11.5",
+>>>>>>> 0f5c0d939d18cdc9b9eb675d68782164c4f21f90
     "axios": "^1.13.2",
     "firebase": "^12.7.0",
     "lucide-react": "^0.561.0",
     "marked": "^17.0.1",
     "qs": "^6.15.2",
+<<<<<<< HEAD
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+=======
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+>>>>>>> 0f5c0d939d18cdc9b9eb675d68782164c4f21f90
     "simple-icons": "^16.23.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.5.3"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@astrojs/node": "^11.0.0",
     "@types/qs": "^6.9.15",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0"
+=======
+    "@astrojs/node": "^8.3.2",
+    "@types/qs": "^6.15.1",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.3"
+>>>>>>> 0f5c0d939d18cdc9b9eb675d68782164c4f21f90
   }
 }

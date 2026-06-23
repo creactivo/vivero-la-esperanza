@@ -39,3 +39,9 @@ pnpm-debug.log*
 
 # Trae AI IDE
 .trae/
+node_modules/
+dist/
+build/
+.venv/
+*.log
+.DS_Store
