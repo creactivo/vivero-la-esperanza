@@ -1,0 +1,381 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ProjectCarousel from "../components/ProjectCarousel.astro";
+import { getProjects, getImageUrl } from "../lib/strapi-projects";
+import type { Proyecto } from "../lib/strapi-projects";
+
+// Proyectos de ejemplo para mostrar cuando la API no responde
+const SAMPLE_PROJECTS: Proyecto[] = [
+    {
+        id: 1,
+        documentId: 'sample-1',
+        nombre: 'Jardín Residencial',
+        descripcion: 'Diseño y ejecución de jardín para vivienda privada.',
+        activo: true,
+        slug: 'jardin-residencial',
+        imagenes: [{ id: 1, documentId: 'img-1', nombre: 'Jardín', alternativeText: 'Jardín de ejemplo', url: '/images/Jardin-1.jpg' }],
+    },
+];
+
+const allProjects = await getProjects();
+const usingFallback = allProjects.length === 0;
+const featuredSource = usingFallback ? SAMPLE_PROJECTS : allProjects;
+const featuredProjects = featuredSource.slice(0, 3).map((project) => ({
+    ...project,
+    imageUrl:
+        project.imagenes && project.imagenes.length > 0
+            ? getImageUrl(project.imagenes[0].url)
+            : '/images/Jardin-1.jpg',
+}));
+---
+
+<Layout title="Nuestro Vivero">
+    <section class="hero-section about-hero">
+        <div class="container text-center">
+            <span class="hero-subtitle">SOBRE NOSOTROS</span>
+            <h1 class="hero-title">Vivero Esperanza</h1>
+            <p class="hero-desc">
+                En Vivero Esperanza, cultivamos más que plantas; cultivamos
+                sueños y espacios verdes que inspiran. Con años de experiencia y
+                una pasión inquebrantable por la naturaleza, somos su aliado
+                perfecto para transformar cualquier ambiente en un refugio de
+                belleza y serenidad.
+            </p>
+        </div>
+    </section>
+
+    <section class="about-content section-padding">
+        <div class="container grid-2-cols">
+            <div class="about-image">
+                <!-- Placeholder image for about section -->
+                <img
+                    src="/images/about-nuestro-vivero-con-planta-suculentas.jpg"
+                    alt="Nuestro Vivero"
+                    class="responsive-image"
+                />
+                <div class="about-image-right">
+                    <!-- Placeholder image for about section -->
+                    <img
+                        src="/images/sembrando.jpg"
+                        alt="Nuestro Vivero"
+                        class="responsive-image"
+                    />
+                </div>
+            </div>
+            <div class="about-text">
+                <h2>Creando Obras Maestras</h2>
+                <p>
+                    Nuestra misión es proveer plantas de la más alta calidad y
+                    ofrecer soluciones innovadoras de diseño paisajístico.
+                    Queremos fomentar la conexión con la naturaleza, mejorar la
+                    calidad de vida y embellecer el mundo, un jardín a la vez.
+                </p>
+                <div class="mt-6">
+                    <a href="/proyectos" class="btn btn-primary btn-lg"
+                        >Catalogo</a
+                    >
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="services-content section-padding">
+        <div class="container services-column">
+            <h2 class="section-title">Proveedores de Grandes Servicios</h2>
+            <p class="services-desc">
+                La venta de plantas al por mayor es un servicio que ofrece la
+                venta de una gran cantidad de plantas a otras empresas o
+                particulares.
+            </p>
+        </div>
+
+        <div class="container services-grid" role="list">
+            <div class="service-item filter-item" role="listitem">
+                <img
+                    src="/images/Jardin-1.jpg"
+                    alt="Proyectos de Construcción"
+                />
+                <h4 class="service-name">Proyectos de Construcción</h4>
+                <p class="service-text">
+                    La venta de plantas al por mayor es un servicio que ofrece
+                    la venta de una gran cantidad de plantas a otras empresas o
+                    particulares. Estas plantas pueden ser utilizadas para
+                    reforestar áreas, para proyectos de paisajismo o para la
+                    venta minorista en centros de jardinería y tiendas
+                    especializadas.
+                </p>
+            </div>
+            <div class="service-item filter-item" role="listitem">
+                <img src="/images/diseño.jpg" alt="Diseño de Jardines" />
+                <h4 class="service-name">Diseño de Jardines</h4>
+                <p class="service-text">
+                    El diseño de jardines es un servicio que se enfoca en la
+                    planificación y creación de un espacio exterior que sea
+                    atractivo y funcional. El objetivo final es crear un espacio
+                    exterior que refleje el estilo y la personalidad del
+                    cliente.
+                </p>
+            </div>
+            <div class="service-item filter-item" role="listitem">
+                <img
+                    src="/images/sembrando.jpg"
+                    alt="Proveedores para Viveros"
+                />
+                <h4 class="service-name">Proveedores para Viveros</h4>
+                <p class="service-text">
+                    El mantenimiento de jardines es un servicio que se enfoca en
+                    mantener la salud y belleza de los jardines. Esto puede
+                    incluir cortar el césped, podar los arbustos y árboles,
+                    fertilizar las plantas y flores, y controlar las malas
+                    hierbas y plagas.
+                </p>
+            </div>
+            <div class="service-item filter-item" role="listitem">
+                <img
+                    src="/images/mantenimiento.jpg"
+                    alt="Mantenimiento de Jardines"
+                />
+                <h4 class="service-name">Mantenimiento de Jardines</h4>
+                <p class="service-text">
+                    La reforestación es un servicio que consiste en plantar
+                    árboles y plantas en áreas previamente deforestadas o donde
+                    la vegetación ha sido eliminada por alguna razón. Los
+                    expertos en reforestación pueden determinar qué especies de
+                    árboles y plantas son adecuadas para la región y el clima.
+                </p>
+            </div>
+        </div>
+    </section>
+    <section class="featured-projects section-padding">
+        <div class="container mb-5">
+            <h2 class="section-title text-center">
+                Nuestros Proyectos Destacados
+            </h2>
+            <p class="section-description text-center">
+                Descubre algunas de nuestras creaciones más recientes que
+                transforman espacios y vidas.
+            </p>
+            {
+                usingFallback && (
+                    <div class="fallback-notice text-center">
+                        <em>
+                            Mostrando proyectos de ejemplo porque la API no
+                            respondió o no hay proyectos publicados.
+                        </em>
+                    </div>
+                )
+            }
+        </div>
+
+        <ProjectCarousel
+            projects={featuredProjects}
+            visibleItems={2}
+            showHeader={false}
+        />
+
+        <div class="container text-center mt-4">
+            <a href="/proyectos" class="btn btn-primary btn-lg"
+                >VER MÁS PROYECTOS</a
+            >
+        </div>
+    </section>
+</Layout>
+
+<style>
+    .about-hero {
+        background-image: url("/images/hero-bg.jpg");
+    }
+
+    .section-padding {
+        padding: 80px 0;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        text-transform: uppercase;
+        color: var(--color-primary-dark);
+        margin-bottom: 20px;
+    }
+
+    .section-description {
+        font-size: 1.1rem;
+        color: var(--color-text-light);
+        max-width: 700px;
+        margin: 0 auto 50px;
+    }
+
+    .grid-2-cols {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 40px;
+        align-items: center;
+    }
+
+    .about-text {
+        padding-right: 120px;
+        padding-left: 120px;
+    }
+    .about-text h2 {
+        font-size: 2.8rem;
+        text-transform: uppercase;
+        color: var(--color-primary);
+    }
+
+    .about-text p {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--color-text);
+        margin-bottom: 20px;
+    }
+
+    .about-image {
+        position: relative;
+    }
+    .about-image img {
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        max-width: 100%;
+        height: auto;
+    }
+    .about-image-right img {
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        max-width: 50%;
+        position: absolute;
+        bottom: -50px;
+        right: -100px;
+        height: auto;
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+
+    .mt-6 {
+        margin-top: 40px;
+    }
+
+    .btn-lg {
+        padding: 15px 30px;
+        font-size: 1.1rem;
+    }
+
+    /* Services content styles */
+    .services-content {
+        padding-top: 60px;
+        padding-bottom: 40px;
+    }
+
+    .services-column {
+        /* max-width: 760px; */
+        margin: 0 auto 20px;
+    }
+
+    .services-line {
+        width: 80px;
+        height: 4px;
+        background: var(--color-primary);
+        margin: 0 auto 18px;
+        border-radius: 2px;
+    }
+
+    .services-title {
+        font-size: 1.6rem;
+        color: var(--color-primary);
+        margin-bottom: 8px;
+    }
+
+    .services-desc {
+        color: var(--color-text);
+        /* max-width: 820px; */
+        margin: 0 auto;
+    }
+
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        margin-top: 30px;
+    }
+
+    .fallback-notice {
+        margin-bottom: 18px;
+        color: var(--color-text-light);
+        font-size: 0.95rem;
+    }
+
+    .service-item {
+        background: #dae2da;
+        padding: 22px;
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        text-align: left;
+        font-weight: 600;
+        color: var(--color-primary-dark);
+    }
+
+    .service-item img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 8px;
+        display: block;
+        margin-bottom: 12px;
+    }
+
+    .service-name {
+        font-size: 1.05rem;
+        text-transform: uppercase;
+        margin: 6px 0 8px;
+        color: var(--color-primary-dark);
+        font-weight: 600;
+    }
+
+    .service-text {
+        font-size: 0.95rem;
+        color: var(--color-text);
+        margin: 0;
+        line-height: 1.4;
+        font-weight: 400;
+    }
+
+    @media (max-width: 992px) {
+        .services-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .grid-2-cols {
+            grid-template-columns: 1fr;
+        }
+        .section-padding {
+            padding: 80px 0px;
+        }
+
+        .about-image {
+            order: -1; /* Image appears above text on mobile */
+            margin-bottom: 30px;
+        }
+
+        /* Adjust hero title for smaller screens */
+        .about-hero .hero-title {
+            font-size: 2.5rem;
+        }
+        .about-image-right .responsive-image{
+            position: static;
+            max-width: 100%;
+            margin-top: 20px;
+        }
+        .about-text{
+            padding-right: 10px;
+            padding-left: 10px;
+}
+
+        .services-grid {
+            grid-template-columns: repeat(1, 1fr);
+        }
+    }
+</style>

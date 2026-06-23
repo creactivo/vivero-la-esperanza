@@ -1,0 +1,67 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ProjectCarousel from "../components/ProjectCarousel.astro";
+import { getProjects, getImageUrl } from "../lib/strapi-projects";
+
+const allProjects = await getProjects();
+
+// Mostrar 4 proyectos en la página de proyectos (3 visibles + 1 en carrusel)
+const projectsWithImages = allProjects.slice(0, 4).map((project) => ({
+    ...project,
+    imageUrl:
+        project.imagenes.length > 0
+            ? getImageUrl(project.imagenes[0].url)
+            : "/images/Jardin-1.jpg",
+}));
+---
+
+<Layout title="Proyectos">
+    <section class="hero-section projects-hero">
+        <div class="container text-center">
+            <span class="hero-subtitle">NUESTRO PORTAFOLIO</span>
+            <h1 class="hero-title">Explora Nuestros Proyectos</h1>
+            <p class="hero-desc">
+                Desde pequeños jardines privados hasta grandes paisajes urbanos,
+                cada proyecto es una obra de arte viva. Descubre cómo hemos
+                transformado espacios y creado belleza natural.
+            </p>
+        </div>
+    </section>
+
+    <section class="all-projects section-padding">
+        <ProjectCarousel
+            title="PROYECTOS"
+            projects={projectsWithImages}
+            visibleItems={3}
+        />
+    </section>
+</Layout>
+
+<style>
+    .projects-hero {
+        background-image: url("/images/hero-bg.jpg");
+    }
+
+    .section-padding {
+        padding: 80px 0;
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+    }
+
+    .fallback-notice {
+        margin-bottom: 18px;
+        color: var(--color-text-light);
+        font-size: 0.95rem;
+    }
+
+    @media (max-width: 768px) {
+        /* Adjust hero title for smaller screens */
+        .projects-hero .hero-title {
+            font-size: 2.5rem;
+        }
+    }
+</style>
