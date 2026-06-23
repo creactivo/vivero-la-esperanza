@@ -10,16 +10,5 @@
     "frontend",
     "backend"
   ],
-  "devDependencies": {
-<<<<<<< HEAD
-    "@astrojs/node": "^10.1.4"
-  },
-  "pnpm": {
-    "overrides": {
-      "zod": "^4.0.0"
-    }
-=======
-    "vercel-ignore": "^1.0.0"
->>>>>>> 0f5c0d939d18cdc9b9eb675d68782164c4f21f90
-  }
+  "devDependencies": {}
 }
