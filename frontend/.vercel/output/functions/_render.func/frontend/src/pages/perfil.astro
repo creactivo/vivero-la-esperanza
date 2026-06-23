@@ -1,0 +1,132 @@
+---
+import Layout from '../layouts/Layout.astro';
+import EditProfileModal from '../components/EditProfileModal.tsx';
+import OrderDetailsModal from '../components/OrderDetailsModal.tsx';
+// ---
+---
+
+<Layout title="Mi Perfil">
+  <div class="container">
+    <div class="profile-header">
+      <h1>Mi Perfil</h1>
+      <p>Aquí puedes ver tu información y tu historial de pedidos.</p>
+    </div>
+
+    <div class="profile-layout">
+      <aside class="profile-sidebar">
+        <nav>
+          <a href="#perfil" class="active">Información Personal</a>
+          <a href="#pedidos">Mis Pedidos</a>
+          <a href="#" id="logout-btn">Cerrar Sesión</a>
+        </nav>
+      </aside>
+
+      <main class="profile-content">
+        <section id="perfil">
+          <h2>Información Personal</h2>
+          <div class="card" id="user-info-card">
+            <p>Cargando información del usuario...</p>
+          </div>
+        </section>
+
+        <section id="pedidos">
+          <h2>Mis Pedidos</h2>
+          <div class="card" id="orders-list">
+            <p>Cargando pedidos...</p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <EditProfileModal client:load />
+  <OrderDetailsModal client:load />
+</Layout>
+
+<script>
+  import { initializeProfilePage } from '../scripts/perfil-logic';
+  initializeProfilePage();
+</script>
+
+<style>
+  .container {
+    padding-top: 120px;
+    padding-bottom: 60px;
+  }
+
+  .profile-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .profile-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 40px;
+  }
+
+  .profile-sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .profile-sidebar a {
+    padding: 12px 20px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: background-color 0.2s;
+  }
+
+  .profile-sidebar a:hover {
+    background-color: #f0f0f0;
+  }
+
+  .profile-sidebar a.active {
+    background-color: var(--color-primary);
+    color: white;
+    font-weight: 500;
+  }
+
+  .profile-content section {
+    margin-bottom: 40px;
+  }
+
+  :global(.user-data-fields) {
+    margin-bottom: 20px;
+  }
+
+  .card {
+    background: white;
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  :global(.order-item) {
+    padding: 25px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  :global(.order-item:last-child) {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  
+  .order-items-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .order-items-list li {
+    margin-bottom: 5px;
+  }
+
+  .order-total {
+    font-weight: bold;
+    margin-top: 10px;
+  }
+</style>

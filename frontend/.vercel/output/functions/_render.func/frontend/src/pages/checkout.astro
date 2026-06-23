@@ -1,0 +1,66 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CheckoutForm from "../components/CheckoutForm";
+---
+
+<Layout title="Checkout" description="Finaliza tu compra">
+    <!-- Header Section -->
+    <div class="checkout-header-section text-center">
+        <span class="detail-badge">PROCESAR PEDIDO</span>
+        <h1 class="main-title">FINALIZAR COMPRA</h1>
+        <p class="header-subtitle">Completa tus datos para procesar el pedido</p>
+    </div>
+
+    <div class="checkout-page">
+        <div class="container">
+            <CheckoutForm client:load />
+        </div>
+    </div>
+</Layout>
+
+<style>
+    .checkout-header-section {
+        padding: 160px 0 40px;
+        background: radial-gradient(
+            circle at center,
+            rgba(230, 240, 230, 0.5) 0%,
+            transparent 70%
+        );
+        background-image: url("/images/hero-bg.jpg");
+        background-size: cover;
+        background-position: center bottom;
+        background-repeat: no-repeat;
+    }
+
+    .detail-badge {
+        background: #d8e2dc;
+        color: #555;
+        font-size: 0.65rem;
+        padding: 6px 16px;
+        border-radius: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    .main-title {
+        font-size: 2.8rem;
+        color: var(--color-primary);
+        margin-bottom: 10px;
+        letter-spacing: -1px;
+        font-weight: 700;
+    }
+
+    .header-subtitle {
+        color: var(--color-text-light);
+        font-size: 1rem;
+        margin-top: 10px;
+    }
+
+    .checkout-page {
+        padding: 60px 0;
+        background: var(--color-background);
+    }
+</style>
