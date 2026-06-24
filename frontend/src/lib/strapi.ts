@@ -52,15 +52,17 @@ export interface SectionsPage {
 }
 
 function normalizeCategory(category: any): Categoria | null {
-    if (!category || !category.id || !category.attributes) return null;
-    return {
-        id: category.id,
-        ...category.attributes,
-    };
+    // For flat response, the category object is already in the correct format.
+    // Return null if it's missing, otherwise return the object itself.
+    if (!category) {
+        return null;
+    }
+    return category;
 }
 
 function normalizeProduct(item: any): Producto {
-    const productData = item.attributes || item;
+    // The response from Strapi Cloud is flat, no 'attributes' wrapper.
+    const productData = item;
     return {
         id: item.id,
         nombre: productData.nombre,
@@ -71,8 +73,10 @@ function normalizeProduct(item: any): Producto {
         stock: productData.stock,
         activo: productData.activo,
         slug: productData.slug,
-        imagenes: (productData.imagenes?.data || []).map((img: any) => ({ id: img.id, ...img.attributes })),
-        categoria: normalizeCategory(productData.categoria?.data),
+        // Relations are also flat, no 'data' wrapper.
+        // Handle null 'imagenes' by defaulting to an empty array.
+        imagenes: productData.imagenes || [],
+        categoria: normalizeCategory(productData.categoria),
     };
 }
 
@@ -91,7 +95,9 @@ export async function getProductos(): Promise<Producto[]> {
                 .filter((producto: Producto) => producto && producto.slug);
         }
 
-        console.warn('La respuesta de la API de productos no tiene la estructura esperada.');
+        console.warn(
+            'La respuesta de la API de productos no tiene la estructura esperada.',
+        );
         return [];
     } catch (error) {
         console.error('Error fetching products:', error);
