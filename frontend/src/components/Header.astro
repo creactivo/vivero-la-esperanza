@@ -62,24 +62,6 @@ import { ShoppingBag, Menu } from "lucide-react";
         }
     }
 
-    // Initialize header scroll state
-    function initHeader() {
-        updateHeaderScroll();
-        window.addEventListener("scroll", updateHeaderScroll);
-    }
-
-    // Initialize on page load
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initHeader);
-    } else {
-        initHeader();
-    }
-
-    // Re-initialize on Astro navigation
-    document.addEventListener("astro:page-load", initHeader);
-    document.addEventListener("astro:after-swap", initHeader);
-
-    // Mobile nav toggle
     function initMobileNav() {
         const mobileNavToggle = document.querySelector(".mobile-nav-toggle");
         const header = document.querySelector(".site-header");
@@ -90,14 +72,17 @@ import { ShoppingBag, Menu } from "lucide-react";
         }
     }
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initMobileNav);
-    } else {
+    function initPageScripts() {
+        updateHeaderScroll();
+        window.addEventListener("scroll", updateHeaderScroll);
         initMobileNav();
     }
 
-    document.addEventListener("astro:page-load", initMobileNav);
-    document.addEventListener("astro:after-swap", initMobileNav);
+    // Run scripts on initial page load
+    initPageScripts();
+
+    // Re-run scripts on Astro's view transitions
+    document.addEventListener("astro:page-load", initPageScripts);
 </script>
 
 <style>
