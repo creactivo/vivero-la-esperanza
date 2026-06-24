@@ -18,8 +18,10 @@ export interface Proyecto {
     }>;
 }
 
-function normalizeProject(item: any): Proyecto {
-    const projectData = item.attributes || item;
+function normalizeProject(item: any): Proyecto | null {
+    if (!item || !item.id || !item.attributes) return null;
+
+    const projectData = item.attributes;
     return {
         id: item.id,
         documentId: projectData.documentId || item.id.toString(),
@@ -27,7 +29,7 @@ function normalizeProject(item: any): Proyecto {
         descripcion: projectData.descripcion,
         activo: projectData.activo,
         slug: projectData.slug,
-        imagenes: projectData.imagenes || [],
+        imagenes: (projectData.imagenes?.data || []).map((img: any) => ({ id: img.id, ...img.attributes })),
     };
 }
 
@@ -40,10 +42,13 @@ export async function getProjects(): Promise<Proyecto[]> {
             },
         });
 
-        const proyectos = (response.data.data as any[]).map(normalizeProject);
-        return proyectos.filter(
-            (proyecto): proyecto is Proyecto => Boolean(proyecto && proyecto.slug)
-        );
+        if (response.data && Array.isArray(response.data.data)) {
+            return response.data.data
+                .map(normalizeProject)
+                .filter((p): p is Proyecto => p !== null && p.slug);
+        }
+
+        return [];
     } catch (error) {
         console.error('[strapi-projects] Error al obtener proyectos:', error);
         return [];
