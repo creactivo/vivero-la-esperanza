@@ -14,17 +14,18 @@ export default function Cart() {
     const [cart, setCart] = useState<CartItem[]>([]);
 
     useEffect(() => {
-        loadCart();
+        // This code now runs only in the browser, after the component has mounted.
+        const savedCart = localStorage.getItem('cart');
+        setCart(savedCart ? JSON.parse(savedCart) : []);
 
-        const handleCartUpdate = () => loadCart();
+        const handleCartUpdate = () => {
+            const updatedCart = localStorage.getItem('cart');
+            setCart(updatedCart ? JSON.parse(updatedCart) : []);
+        };
+
         window.addEventListener('cartUpdated', handleCartUpdate);
         return () => window.removeEventListener('cartUpdated', handleCartUpdate);
     }, []);
-
-    const loadCart = () => {
-        const savedCart = localStorage.getItem('cart');
-        setCart(savedCart ? JSON.parse(savedCart) : []);
-    };
 
     const updateQuantity = (productoId: number, newQuantity: number) => {
         const updatedCart = cart.map(item =>
