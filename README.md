@@ -19,18 +19,11 @@ Plataforma de e-commerce mayorista de plantas construida con Astro, Strapi y Fir
 
 ## 🚀 Instalación
 
-### 1. Frontend (Astro)
+Este es un monorepo gestionado con **pnpm workspaces**. La instalación de todas las dependencias (tanto del frontend como del backend) se realiza con un único comando desde la raíz del proyecto.
 
 ```bash
-cd frontend
-npm install
-```
-
-### 2. Backend (Strapi)
-
-```bash
-cd backend
-npm install
+# Desde la raíz del proyecto
+pnpm install
 ```
 
 ## ⚙️ Configuración
@@ -98,6 +91,32 @@ Strapi estará disponible en: http://localhost:1337
 5. Activa permisos públicos para:
    - `producto: find, findOne`
    - `categoria: find, findOne`
+
+## 📝 Notas de Arquitectura y Dependencias
+
+Esta sección documenta decisiones clave y soluciones a conflictos de dependencias para mantener la estabilidad del proyecto.
+
+### 1. Gestor de Paquetes: `pnpm workspaces`
+
+- **Regla:** Utilizar siempre `pnpm` para la gestión de dependencias.
+- **Instalación:** Ejecutar `pnpm install` únicamente desde la raíz del proyecto.
+- **Scripts:** Ejecutar scripts con `pnpm --filter <nombre_workspace> <script>`, por ejemplo: `pnpm --filter frontend dev`.
+
+### 2. Resolución de Conflictos de Dependencias (`pnpm.overrides`)
+
+Para resolver conflictos de `peer dependencies` entre los workspaces, se utiliza la propiedad `pnpm.overrides` en el archivo `package.json` de la **raíz del proyecto**.
+
+- **Conflicto `codemirror` en `backend` (Strapi):**
+  - **Problema:** Una dependencia de Strapi (`@uiw/react-codemirror`) requiere `codemirror@^6.0.0`, pero otra dependencia transitiva intentaba instalar `codemirror@^5.0.0`, causando un conflicto.
+  - **Solución:** Se ha añadido un `override` en el `package.json` de la raíz para forzar la versión correcta en todo el monorepo.
+    ```json
+    "pnpm": {
+      "overrides": {
+        "codemirror": "6.0.1"
+      }
+    }
+    ```
+  - **Ubicación:** Esta configuración **debe** estar en el `package.json` de la raíz, no en los `package.json` de los workspaces individuales.
 
 ### 3. Agregar Productos
 

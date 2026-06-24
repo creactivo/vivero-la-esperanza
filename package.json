@@ -1,14 +1,16 @@
 {
   "private": true,
   "packageManager": "pnpm@10.28.0",
-  "pnpm": {
-    "overrides": {
-      "zod": "3.24.1"
-    }
-  },
   "workspaces": [
     "frontend",
     "backend"
   ],
+  "pnpm": {
+    "overrides": {
+      "codemirror": "6.0.1",
+      "zod": "3.25.76",
+      "typescript": "5.5.4"
+    }
+  },
   "devDependencies": {}
 }
