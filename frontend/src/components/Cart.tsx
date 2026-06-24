@@ -11,6 +11,7 @@ interface CartItem {
 }
 
 export default function Cart() {
+    console.log('Componente Cart.tsx renderizando...');
     const [cart, setCart] = useState<CartItem[]>([]);
 
     useEffect(() => {
