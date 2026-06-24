@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { auth, onAuthStateChanged, signOut } from '../lib/firebase';
 import type { User as FirebaseUser } from 'firebase/auth';
 import { User as UserIcon } from 'lucide-react';

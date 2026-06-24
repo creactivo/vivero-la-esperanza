@@ -51,13 +51,12 @@ export interface SectionsPage {
     componente: HeroPrincipal;
 }
 
-function normalizeCategory(category: any): any {
-    if (!category) return null;
-    if (category.id && category.nombre) return category;
-    if (category.data) {
-        return { id: category.data.id, ...category.data.attributes };
-    }
-    return null;
+function normalizeCategory(category: any): Categoria | null {
+    if (!category || !category.id || !category.attributes) return null;
+    return {
+        id: category.id,
+        ...category.attributes,
+    };
 }
 
 function normalizeProduct(item: any): Producto {
@@ -72,8 +71,8 @@ function normalizeProduct(item: any): Producto {
         stock: productData.stock,
         activo: productData.activo,
         slug: productData.slug,
-        imagenes: productData.imagenes || [],
-        categoria: normalizeCategory(productData.categoria),
+        imagenes: (productData.imagenes?.data || []).map((img: any) => ({ id: img.id, ...img.attributes })),
+        categoria: normalizeCategory(productData.categoria?.data),
     };
 }
 
@@ -124,7 +123,13 @@ export async function getCategorias(): Promise<Categoria[]> {
         const response = await strapiApi.get('/categorias', {
             params: { populate: '*' },
         });
-        return response.data.data.map(normalizeCategory);
+
+        if (response.data && Array.isArray(response.data.data)) {
+            return response.data.data
+                .map(normalizeCategory)
+                .filter((c): c is Categoria => c !== null);
+        }
+        return [];
     } catch (error) {
         console.error('Error fetching categories:', error);
         return [];
