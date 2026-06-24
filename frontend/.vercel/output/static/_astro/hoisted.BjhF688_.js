@@ -1,1 +1,0 @@
-import"./hoisted.DMrs04lJ.js";const c=document.querySelectorAll(".thumb-btn"),s=document.getElementById("mainImage");c.forEach(t=>{t.addEventListener("click",()=>{const e=t.getAttribute("data-src");e&&s&&(s.src=e),c.forEach(a=>a.classList.remove("active")),t.classList.add("active")})});
