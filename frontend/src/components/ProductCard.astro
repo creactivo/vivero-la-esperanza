@@ -9,15 +9,9 @@ interface Props {
 
 const { producto } = Astro.props;
 
-if (!producto?.slug) {
-    return null;
-}
+
 
 const { nombre, precio, stock, slug, imagenes } = producto;
-
-const imageUrl = imagenes?.[0]
-    ? getImageUrl(imagenes[0].url)
-    : "/images/Jardin-2.jpg";
 ---
 
 <article class="product-card">
@@ -25,21 +19,29 @@ const imageUrl = imagenes?.[0]
         <span class="badge-new">NUEVO</span>
     </div>
 
-    <a href={`/producto/${slug}`} class="block img-link">
+    <a href={slug ? `/producto/${slug}` : '#'} class="block img-link">
         <div class="image-wrapper">
-            <img
-                src={imageUrl}
-                alt={nombre}
-                loading="lazy"
-                data-product-slug={slug}
-            />
+            {imagenes?.[0]?.url ? (
+                <img
+                    src={getImageUrl(imagenes[0].url)}
+                    alt={nombre || ''}
+                    loading="lazy"
+                    data-product-slug={slug}
+                />
+            ) : (
+                <div class="image-placeholder">
+                    <span>falta este elemento error 404</span>
+                </div>
+            )}
         </div>
     </a>
 
     <div class="card-content">
         <div class="product-info-col">
             <h3 class="product-title">
-                <a href={`/producto/${slug}`}>{nombre}</a>
+                <a href={slug ? `/producto/${slug}` : '#'}>
+                    {nombre || "falta este elemento error 404"}
+                </a>
             </h3>
             <div class="rating">
                 {
@@ -47,24 +49,29 @@ const imageUrl = imagenes?.[0]
                         .fill(0)
                         .map((_) => (
                             <Heart size={14} fill="#00FF85" color="#00FF85" />
-                        ))
-                }
+                        ))                }
             </div>
         </div>
 
         <div class="product-details-col">
             <div class="stock-info">
-                {stock > 0 ? `${stock} disp.` : "Agotado"}
+                {typeof stock === "number"
+                    ? stock > 0
+                        ? `${stock} disp.`
+                        : "Agotado"
+                    : "falta este elemento error 404"}
             </div>
             <div class="product-price">
-                ${precio.toLocaleString("es-CO")}
+                {typeof precio === "number"
+                    ? `$${precio.toLocaleString("es-CO")}`
+                    : "falta este elemento error 404"}
             </div>
-             <a
-            href={`/producto/${slug}`}
-            class="btn btn-primary btn-sm btn-order product-button-col"
-        >
-            Ver Más
-        </a>
+            <a
+                href={slug ? `/producto/${slug}` : '#'}
+                class="btn btn-primary btn-sm btn-order product-button-col"
+            >
+                Ver Más
+            </a>
         </div>
     </div>
 </article>
