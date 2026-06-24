@@ -241,6 +241,7 @@ Para producción, se recomienda usar PostgreSQL o MySQL en lugar de SQLite:
 3. Despliega con `npm start`
 ## aca se colocan los cambios para que se pueda hacer un commit
 Despliega coommit 1 jaja
+Despliega coommit 2 jaja
 ## 🤝 Soporte
 
 Para preguntas o problemas, contacta al equipo de desarrollo.
