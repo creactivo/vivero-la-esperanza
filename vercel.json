@@ -1,5 +1,0 @@
-{
-  "installCommand": "pnpm install --filter frontend... --prod=false --no-frozen-lockfile",
-  "buildCommand": "pnpm --filter frontend build && cp -R frontend/.vercel .vercel",
-  "framework": "astro"
-}
