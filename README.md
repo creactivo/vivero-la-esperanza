@@ -239,7 +239,8 @@ Para producción, se recomienda usar PostgreSQL o MySQL en lugar de SQLite:
 1. Configura la base de datos en `backend/config/database.js`
 2. Ejecuta `npm run build`
 3. Despliega con `npm start`
-
+## aca se colocan los cambios para que se pueda hacer un commit
+Despliega coommit 1 jaja
 ## 🤝 Soporte
 
 Para preguntas o problemas, contacta al equipo de desarrollo.
