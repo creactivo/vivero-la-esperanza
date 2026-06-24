@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { registerUser, loginUser, db } from '../lib/firebase';
 import { Lock } from 'lucide-react';
 import { collection, doc, setDoc } from 'firebase/firestore';
