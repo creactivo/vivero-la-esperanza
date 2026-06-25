@@ -19,8 +19,6 @@ const [productos, categorias, sectionsPage] = await Promise.all([
     getSectionsPage(),
 ]);
 
-console.log('Datos de productos recibidos en la página (después de normalización):', productos);
-
 // Extraer datos del hero dinámico
 const heroData = sectionsPage?.componente;
 const heroBgImage = heroData?.imagenbanner?.[0]

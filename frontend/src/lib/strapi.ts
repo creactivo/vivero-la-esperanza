@@ -89,8 +89,6 @@ export async function getProductos(): Promise<Producto[]> {
             },
         });
 
-        console.log('Respuesta cruda de la API de Strapi:', JSON.stringify(response.data, null, 2));
-
         if (response.data && Array.isArray(response.data.data)) {
             return response.data.data
                 .map(normalizeProduct)
