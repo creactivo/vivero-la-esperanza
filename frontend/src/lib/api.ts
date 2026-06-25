@@ -4,7 +4,7 @@
  */
 import axios from 'axios';
 
-const STRAPI_URL = import.meta.env.PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
+const STRAPI_URL = import.meta.env.STRAPI_API_URL || 'http://127.0.0.1:1337';
 // The environment variable MUST be prefixed with PUBLIC_ to be available in the browser.
 const STRAPI_API_TOKEN = import.meta.env.PUBLIC_STRAPI_API_TOKEN;
 
