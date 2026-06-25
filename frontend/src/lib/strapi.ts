@@ -89,8 +89,8 @@ export async function getProductos(): Promise<Producto[]> {
             },
         });
 
-        if (response.data && Array.isArray(response.data.data)) {
-            return response.data.data
+        if (Array.isArray(response.data)) {
+            return response.data
                 .map(normalizeProduct)
                 .filter((producto: Producto) => producto && producto.slug);
         }
