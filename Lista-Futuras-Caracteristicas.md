@@ -16,5 +16,7 @@ Aquí puedes añadir las ideas y tareas pendientes para que yo pueda implementar
 ## Seguridad y Despliegue
 - [x] Configurar reglas de seguridad de Cloud Firestore en Firebase Console para proteger la colección `ordenes` (solo usuarios autenticados pueden crear; solo el dueño puede leer/escribir).
 - [x] Asegurarse de que el archivo `.env` esté listado en `.gitignore` para no subir secretos a GitHub.
-- [ ] Configurar la variable `CORS_ORIGINS` en el panel de control de Strapi Cloud apuntando únicamente al dominio de producción de Vercel.
-- [ ] Generar un Token de API Read-Only en Strapi Cloud y añadirlo como `STRAPI_API_TOKEN` en Vercel.
+- [x] Configurar la variable `CORS_ORIGINS` en el panel de control de Strapi Cloud apuntando únicamente al dominio de producción de Vercel.
+- [x] Generar un Token de API Read-Only en Strapi Cloud y añadirlo como `STRAPI_API_TOKEN` en Vercel.
+- [x] Implementar badges, que solo se activen si el producto es nuevo. quitarlas de las categorias.
+

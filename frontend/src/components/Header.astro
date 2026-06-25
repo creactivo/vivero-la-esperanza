@@ -51,38 +51,52 @@ import { ShoppingBag, Menu } from "lucide-react";
 </header>
 
 <script>
-    function updateHeaderScroll() {
+    // --- Script mejorado para mayor robustez con Astro View Transitions ---
+
+    // Función para actualizar el estilo del header al hacer scroll
+    function updateHeaderOnScroll() {
         const header = document.querySelector(".site-header");
-        if (header) {
-            if (window.scrollY > 50) {
-                header.classList.add("scrolled");
-            } else {
-                header.classList.remove("scrolled");
+        if (!header) return;
+
+        if (window.scrollY > 50) {
+            header.classList.add("scrolled");
+        } else {
+            header.classList.remove("scrolled");
+        }
+    }
+
+    // Se añade el listener de scroll una sola vez, ya que 'window' no cambia.
+    window.addEventListener("scroll", updateHeaderOnScroll);
+
+    // Se usa delegación de eventos para el menú hamburguesa.
+    // Esto asegura que funcione incluso si Astro reemplaza el botón en las transiciones.
+    document.addEventListener("click", function(event) {
+        const toggleButton = event.target.closest('.mobile-nav-toggle');
+        if (toggleButton) {
+            const header = document.querySelector(".site-header");
+            if (header) {
+                header.classList.toggle("nav-open");
             }
         }
-    }
+    });
 
-    function initMobileNav() {
-        const mobileNavToggle = document.querySelector(".mobile-nav-toggle");
+    // Función que se ejecuta en cada carga de página (inicial y de navegación)
+    function onPageLoad() {
+        // 1. Asegurarse de que el estado de scroll del header es el correcto al cargar.
+        updateHeaderOnScroll();
+
+        // 2. Asegurarse de que el menú móvil esté cerrado al navegar a una nueva página.
         const header = document.querySelector(".site-header");
-        if (mobileNavToggle && header) {
-            mobileNavToggle.addEventListener("click", () => {
-                header.classList.toggle("nav-open");
-            });
+        if (header) {
+            header.classList.remove("nav-open");
         }
     }
 
-    function initPageScripts() {
-        updateHeaderScroll();
-        window.addEventListener("scroll", updateHeaderScroll);
-        initMobileNav();
-    }
+    // Ejecutar en la carga inicial de la página
+    onPageLoad();
 
-    // Run scripts on initial page load
-    initPageScripts();
-
-    // Re-run scripts on Astro's view transitions
-    document.addEventListener("astro:page-load", initPageScripts);
+    // Ejecutar en las cargas de página subsecuentes de Astro
+    document.addEventListener("astro:page-load", onPageLoad);
 </script>
 
 <style>

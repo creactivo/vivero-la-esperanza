@@ -122,7 +122,7 @@ export default function CheckoutForm() {
             }
 
             // 6. Generar link de WhatsApp
-            const phoneInfo = import.meta.env.PUBLIC_WHATSAPP_NUMBER || '3052928927';
+            const phoneInfo = import.meta.env.PUBLIC_WHATSAPP_NUMBER || '3052928924';
             const clienteAny = nuevoPedido.cliente as any;
             const wppMessage = `¡Hola! Acabo de realizar un pedido en la tienda.
 *ID Pedido:* ${orderDoc.id}

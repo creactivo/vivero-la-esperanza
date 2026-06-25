@@ -87,17 +87,19 @@ const carruseles = Array.from(productosPorCategoria.entries());
                         <Sprout color="#3A5A40" size={24} />,
                         <Scissors color="#3A5A40" size={24} />,
                     ];
+                    // La solución completa: Crear la página dinámica src/pages/categoria/[slug].astro. Esto implica crear un nuevo archivo que:
+                    // Le diga a Astro todas las slugs de categorías que existen.
+                    // Para cada slug, obtenga los productos de esa categoría desde Strapi.
+                    // Muestre esos productos en una página. Esta es la solución "correcta" a largo plazo, pero es más compleja.
+                    // Por ahora, el enlace se ha convertido en un <div> para evitar errores 404.
                     return (
-                        <a
-                            href={`/categoria/${categoria.slug}`}
-                            class="filter-item"
-                        >
+                        <div class="filter-item">
                             <span class="badg-disc">NUEVO</span>
                             <span class="icon">
                                 {icons[index % icons.length]}
                             </span>
                             <span>{categoria.nombre}</span>
-                        </a>
+                        </div>
                     );
                 })
             }
@@ -551,6 +553,14 @@ const carruseles = Array.from(productosPorCategoria.entries());
         }
         .hero-title {
             font-size: 2.5rem;
+        }
+        .filter-item {
+        padding: 12px;
+        gap: 8px;
+        }
+        .icon svg{
+            display: block;
+            max-width: 80%;
         }
     }
 </style>
