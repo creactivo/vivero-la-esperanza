@@ -4,12 +4,9 @@
  */
 import axios from 'axios';
 
-console.log('[Vercel Build] Reading Environment Variables...');
-console.log(`[Vercel Build] PUBLIC_STRAPI_URL: ${import.meta.env.PUBLIC_STRAPI_URL}`);
-console.log(`[Vercel Build] STRAPI_API_TOKEN is present: ${!!import.meta.env.STRAPI_API_TOKEN}`);
-
 const STRAPI_URL = import.meta.env.PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
-const STRAPI_API_TOKEN = import.meta.env.STRAPI_API_TOKEN;
+// The environment variable MUST be prefixed with PUBLIC_ to be available in the browser.
+const STRAPI_API_TOKEN = import.meta.env.PUBLIC_STRAPI_API_TOKEN;
 
 export const strapiApi = axios.create({
     baseURL: `${STRAPI_URL}/api`,
