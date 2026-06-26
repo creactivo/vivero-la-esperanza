@@ -180,11 +180,10 @@ function initProductCarousels() {
         let startX = 0;
         let startScrollLeft = 0;
 
-        carousel.addEventListener('mousedown', (e: Event) => {
-            const me = e as MouseEvent;
+        carousel.addEventListener('mousedown', (e: MouseEvent) => {
             isDown = true;
             carousel.classList.add('active');
-            startX = me.pageX - carousel.offsetLeft;
+            startX = e.pageX - carousel.offsetLeft;
             startScrollLeft = carousel.scrollLeft;
         });
 
@@ -196,11 +195,10 @@ function initProductCarousels() {
         carousel.addEventListener('mouseleave', endDrag);
         carousel.addEventListener('mouseup', endDrag);
 
-        carousel.addEventListener('mousemove', (e: Event) => {
-            const me = e as MouseEvent;
+        carousel.addEventListener('mousemove', (e: MouseEvent) => {
             if (!isDown) return;
-            me.preventDefault();
-            const x = me.pageX - carousel.offsetLeft;
+            e.preventDefault();
+            const x = e.pageX - carousel.offsetLeft;
             const walk = (x - startX) * 2;
             carousel.scrollLeft = startScrollLeft - walk;
         });
@@ -208,10 +206,9 @@ function initProductCarousels() {
         // Touch events for mobile
         carousel.addEventListener(
             'touchstart',
-            (e: Event) => {
-                const te = e as TouchEvent;
+            (e: TouchEvent) => {
                 isDown = true;
-                startX = te.touches[0].pageX - carousel.offsetLeft;
+                startX = e.touches[0].pageX - carousel.offsetLeft;
                 startScrollLeft = carousel.scrollLeft;
             },
             { passive: true }
@@ -219,10 +216,9 @@ function initProductCarousels() {
 
         carousel.addEventListener(
             'touchmove',
-            (e: Event) => {
-                const te = e as TouchEvent;
+            (e: TouchEvent) => {
                 if (!isDown) return;
-                const x = te.touches[0].pageX - carousel.offsetLeft;
+                const x = e.touches[0].pageX - carousel.offsetLeft;
                 const walk = (x - startX) * 2;
                 carousel.scrollLeft = startScrollLeft - walk;
             },
