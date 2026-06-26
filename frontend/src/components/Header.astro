@@ -50,7 +50,7 @@ import { ShoppingBag, Menu } from "lucide-react";
     </div>
 </header>
 
-<script>
+<script is:inline>
     let scrollTimeout = null;
     const header = document.querySelector(".site-header");
 
@@ -75,15 +75,19 @@ import { ShoppingBag, Menu } from "lucide-react";
     window.addEventListener("scroll", throttledScroll, { passive: true });
 
     document.addEventListener("click", function(event) {
-        const toggleButton = event.target.closest('.mobile-nav-toggle');
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const toggleButton = target.closest('.mobile-nav-toggle');
         if (toggleButton && header) {
             header.classList.toggle("nav-open");
         }
     });
 
     document.addEventListener("click", function(event) {
-        const mobileNav = event.target.closest('.mobile-nav');
-        const toggleBtn = event.target.closest('.mobile-nav-toggle');
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const mobileNav = target.closest('.mobile-nav');
+        const toggleBtn = target.closest('.mobile-nav-toggle');
         if (!mobileNav && !toggleBtn && header?.classList.contains("nav-open")) {
             header.classList.remove("nav-open");
         }
