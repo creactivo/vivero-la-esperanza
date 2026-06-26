@@ -182,112 +182,111 @@ ${cart.map((i: any) => `- ${i.cantidad}x ${i.nombre}`).join('\n')}`;
 
     return (
         <div className="checkout-container">
-            {currentUser && userData ? (
-                <div className="user-info-summary">
-                    <h3>Información de Envío</h3>
-                    <p>Hola de nuevo, <strong>{userData.nombre}</strong>. Usaremos la información de tu perfil para este pedido.</p>
-                    <div className="user-data-display">
-                        <p><strong>Nombre:</strong> {userData.nombre} {userData.apellido}</p>
-                        <p><strong>Email:</strong> {userData.email}</p>
-                        <p><strong>Teléfono:</strong> {userData.telefono || 'No especificado'}</p>
-                        <p><strong>Dirección de Envío:</strong> {userData.direccion || 'No especificada'}, {userData.ciudad || 'Sin ciudad'}</p>
+            <form onSubmit={handleSubmit}>
+                {currentUser && userData ? (
+                    <div className="user-info-summary">
+                        <h3>Información de Envío</h3>
+                        <p>Hola de nuevo, <strong>{userData.nombre}</strong>. Usaremos la información de tu perfil para este pedido.</p>
+                        <div className="user-data-display">
+                            <p><strong>Nombre:</strong> {userData.nombre} {userData.apellido}</p>
+                            <p><strong>Email:</strong> {userData.email}</p>
+                            <p><strong>Teléfono:</strong> {userData.telefono || 'No especificado'}</p>
+                            <p><strong>Dirección de Envío:</strong> {userData.direccion || 'No especificada'}, {userData.ciudad || 'Sin ciudad'}</p>
+                        </div>
+                        <p className="info-text">Asegúrate de que tu dirección y datos de contacto estén actualizados en tu perfil.</p>
                     </div>
-                    <p className="info-text">Asegúrate de que tu dirección y datos de contacto estén actualizados en tu perfil.</p>
-                </div>
-            ) : (
-                <>
-                    <div className="login-prompt">
-                        <p>¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a> para un proceso más rápido.</p>
-                    </div>
-                    <form id="checkout-form-guest" className="checkout-form">
-                        <div className="form-group">
-                            <label>Nombre Completo *</label>
-                            <input
-                                type="text"
-                                name="nombreCompleto"
-                                required
-                                value={formData.nombreCompleto}
-                                onChange={handleChange}
-                                className="input-field"
-                            />
+                ) : (
+                    <>
+                        <div className="login-prompt">
+                            <p>¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a> para un proceso más rápido.</p>
                         </div>
-
-                        <div className="form-row">
+                        <div className="checkout-form">
                             <div className="form-group">
-                                <label>Email *</label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    required
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    className="input-field"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Celular *</label>
-                                <input
-                                    type="tel"
-                                    name="celular"
-                                    required
-                                    value={formData.celular}
-                                    onChange={handleChange}
-                                    className="input-field"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Empresa (Opcional)</label>
-                            <input
-                                type="text"
-                                name="empresa"
-                                value={formData.empresa}
-                                onChange={handleChange}
-                                className="input-field"
-                            />
-                        </div>
-
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>Dirección de Envío *</label>
+                                <label>Nombre Completo *</label>
                                 <input
                                     type="text"
-                                    name="direccion"
+                                    name="nombreCompleto"
                                     required
-                                    value={formData.direccion}
+                                    value={formData.nombreCompleto}
                                     onChange={handleChange}
                                     className="input-field"
                                 />
                             </div>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Email *</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        required
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        className="input-field"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Celular *</label>
+                                    <input
+                                        type="tel"
+                                        name="celular"
+                                        required
+                                        value={formData.celular}
+                                        onChange={handleChange}
+                                        className="input-field"
+                                    />
+                                </div>
+                            </div>
+
                             <div className="form-group">
-                                <label>Ciudad *</label>
+                                <label>Empresa (Opcional)</label>
                                 <input
                                     type="text"
-                                    name="ciudad"
-                                    required
-                                    value={formData.ciudad}
+                                    name="empresa"
+                                    value={formData.empresa}
                                     onChange={handleChange}
                                     className="input-field"
                                 />
                             </div>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Dirección de Envío *</label>
+                                    <input
+                                        type="text"
+                                        name="direccion"
+                                        required
+                                        value={formData.direccion}
+                                        onChange={handleChange}
+                                        className="input-field"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Ciudad *</label>
+                                    <input
+                                        type="text"
+                                        name="ciudad"
+                                        required
+                                        value={formData.ciudad}
+                                        onChange={handleChange}
+                                        className="input-field"
+                                    />
+                                </div>
+                            </div>
                         </div>
-                    </form>
-                </>
-            )}
-            
-            {error && <p className="error-message">{error}</p>}
-            
-            <button
-                type="button"
-                className="btn-checkout"
-                disabled={loading}
-                onClick={handleSubmit}
-            >
-                {loading ? 'PROCESANDO...' : 'CONFIRMAR PEDIDO'}
-            </button>
-
-
+                    </>
+                )}
+                
+                {error && <p className="error-message">{error}</p>}
+                
+                <button
+                    type="submit"
+                    className="btn-checkout"
+                    disabled={loading}
+                >
+                    {loading ? 'PROCESANDO...' : 'CONFIRMAR PEDIDO'}
+                </button>
+            </form>
         </div>
     );
 }

@@ -19,17 +19,16 @@ export interface Proyecto {
 }
 
 function normalizeProject(item: any): Proyecto | null {
-    if (!item || !item.id || !item.attributes) return null;
+    if (!item || !item.id) return null;
 
-    const projectData = item.attributes;
     return {
         id: item.id,
-        documentId: projectData.documentId || item.id.toString(),
-        nombre: projectData.nombre,
-        descripcion: projectData.descripcion,
-        activo: projectData.activo,
-        slug: projectData.slug,
-        imagenes: (projectData.imagenes?.data || []).map((img: any) => ({ id: img.id, ...img.attributes })),
+        documentId: item.documentId || item.id.toString(),
+        nombre: item.nombre,
+        descripcion: item.descripcion,
+        activo: item.activo,
+        slug: item.slug,
+        imagenes: item.imagenes || [],
     };
 }
 
