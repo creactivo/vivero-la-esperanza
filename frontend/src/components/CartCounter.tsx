@@ -17,8 +17,18 @@ export default function CartCounter() {
 
     useEffect(() => {
         updateCount();
+        
+        // Listener para actualizaciones en la misma página
         window.addEventListener('cartUpdated', updateCount);
-        return () => window.removeEventListener('cartUpdated', updateCount);
+        
+        // Listener para resincronizar después de la navegación de Astro
+        document.addEventListener('astro:page-load', updateCount);
+
+        // Limpieza de ambos listeners al desmontar el componente
+        return () => {
+            window.removeEventListener('cartUpdated', updateCount);
+            document.removeEventListener('astro:page-load', updateCount);
+        };
     }, []);
 
     if (count === 0) {
