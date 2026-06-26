@@ -50,57 +50,48 @@ import { ShoppingBag, Menu } from "lucide-react";
     </div>
 </header>
 
-<script>
-    let scrollTimeout: number | null = null;
-    const header = document.querySelector(".site-header");
+<script is:inline>
+    document.addEventListener("DOMContentLoaded", initHeader);
+    document.addEventListener("astro:page-load", initHeader);
 
-    function updateHeaderOnScroll() {
+    function initHeader() {
+        let header = document.querySelector(".site-header");
         if (!header) return;
-        if (window.scrollY > 50) {
-            header.classList.add("scrolled");
-        } else {
-            header.classList.remove("scrolled");
-        }
-    }
 
-    function throttledScroll() {
-        if (scrollTimeout) return;
-        scrollTimeout = window.setTimeout(() => {
-            updateHeaderOnScroll();
-            scrollTimeout = null;
-        }, 16);
-    }
-
-    window.addEventListener("scroll", throttledScroll, { passive: true });
-
-    document.addEventListener("click", function(event) {
-        const target = event.target;
-        if (!(target instanceof Element)) return;
-        const toggleButton = target.closest('.mobile-nav-toggle');
-        if (toggleButton && header) {
-            header.classList.toggle("nav-open");
-        }
-    });
-
-    document.addEventListener("click", function(event) {
-        const target = event.target;
-        if (!(target instanceof Element)) return;
-        const mobileNav = target.closest('.mobile-nav');
-        const toggleBtn = target.closest('.mobile-nav-toggle');
-        if (!mobileNav && !toggleBtn && header && header.classList.contains("nav-open")) {
-            header.classList.remove("nav-open");
-        }
-    });
-
-    function onPageLoad() {
+        // Update header immediately on load
         updateHeaderOnScroll();
-        if (header) {
-            header.classList.remove("nav-open");
+
+        // Scroll handler (without throttle for smoothness)
+        window.addEventListener("scroll", updateHeaderOnScroll, { passive: true });
+
+        // Mobile nav handlers
+        document.addEventListener("click", function(event) {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+            const toggleButton = target.closest('.mobile-nav-toggle');
+            if (toggleButton && header) {
+                header.classList.toggle("nav-open");
+            }
+        });
+
+        document.addEventListener("click", function(event) {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+            const mobileNav = target.closest('.mobile-nav');
+            const toggleBtn = target.closest('.mobile-nav-toggle');
+            if (!mobileNav && !toggleBtn && header && header.classList.contains("nav-open")) {
+                header.classList.remove("nav-open");
+            }
+        });
+
+        function updateHeaderOnScroll() {
+            if (window.scrollY > 50) {
+                header.classList.add("scrolled");
+            } else {
+                header.classList.remove("scrolled");
+            }
         }
     }
-
-    onPageLoad();
-    document.addEventListener("astro:page-load", onPageLoad);
 </script>
 
 <style>
