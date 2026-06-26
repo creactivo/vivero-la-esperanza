@@ -128,7 +128,7 @@ const mainImage = imageUrls[0] || "/images/Jardin-2.jpg";
 
                 <!-- Botón de compra (React) -->
                 <AddToCartButton
-                    client:load
+                    client:only="react"
                     productoId={producto.id}
                     nombre={nombre}
                     precioMayorista={precioMayorista}

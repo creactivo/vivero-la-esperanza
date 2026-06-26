@@ -38,8 +38,8 @@ import OrderDetailsModal from '../components/OrderDetailsModal.tsx';
       </main>
     </div>
   </div>
-  <EditProfileModal client:load />
-  <OrderDetailsModal client:load />
+  <EditProfileModal client:only="react" />
+  <OrderDetailsModal client:only="react" />
 </Layout>
 
 <script>
