@@ -51,7 +51,7 @@ import { ShoppingBag, Menu } from "lucide-react";
 </header>
 
 <script>
-    let scrollTimeout = null;
+    let scrollTimeout: number | null = null;
     const header = document.querySelector(".site-header");
 
     function updateHeaderOnScroll() {
@@ -75,7 +75,8 @@ import { ShoppingBag, Menu } from "lucide-react";
 
     document.addEventListener("click", function(event) {
         const target = event.target;
-        const toggleButton = target && target.closest ? target.closest('.mobile-nav-toggle') : null;
+        if (!(target instanceof Element)) return;
+        const toggleButton = target.closest('.mobile-nav-toggle');
         if (toggleButton && header) {
             header.classList.toggle("nav-open");
         }
@@ -83,8 +84,9 @@ import { ShoppingBag, Menu } from "lucide-react";
 
     document.addEventListener("click", function(event) {
         const target = event.target;
-        const mobileNav = target && target.closest ? target.closest('.mobile-nav') : null;
-        const toggleBtn = target && target.closest ? target.closest('.mobile-nav-toggle') : null;
+        if (!(target instanceof Element)) return;
+        const mobileNav = target.closest('.mobile-nav');
+        const toggleBtn = target.closest('.mobile-nav-toggle');
         if (!mobileNav && !toggleBtn && header && header.classList.contains("nav-open")) {
             header.classList.remove("nav-open");
         }
