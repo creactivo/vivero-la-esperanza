@@ -245,6 +245,7 @@ Despliega coommit 2 jaja
 Despliega coommit 3 jaja
 Despliega coommit 4 jaja
 Despliega coommit 5 jaja
+Despliega coommit 6 hazta aca todo marcha perfectamente jaja
 
 ## 🤝 Soporte
 
