@@ -93,13 +93,13 @@ const carruseles = Array.from(productosPorCategoria.entries());
                     // Muestre esos productos en una página. Esta es la solución "correcta" a largo plazo, pero es más compleja.
                     // Por ahora, el enlace se ha convertido en un <div> para evitar errores 404.
                     return (
-                        <div class="filter-item">
+                        <a href={`/categoria/${categoria.slug}`} class="filter-item">
                             <span class="badg-disc">NUEVO</span>
                             <span class="icon">
                                 {icons[index % icons.length]}
                             </span>
                             <span>{categoria.nombre}</span>
-                        </div>
+                        </a>
                     );
                 })
             }

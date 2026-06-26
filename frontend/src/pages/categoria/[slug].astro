@@ -1,0 +1,62 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import ProductCard from "../../components/ProductCard.astro";
+import { getCategorias, getProductosByCategoria, getImageUrl } from "../../lib/strapi";
+
+// Obtener todas las categorías para generar las páginas estáticas
+export async function getStaticPaths() {
+    const categorias = await getCategorias();
+    return categorias.map((categoria) => ({
+        params: { slug: categoria.slug },
+    }));
+}
+
+// Obtener datos para la página actual
+const { slug } = Astro.params;
+const categoria = (await getCategorias()).find(c => c.slug === slug);
+const productos = await getProductosByCategoria(slug || "");
+
+if (!categoria) {
+    return Astro.redirect("/404");
+}
+---
+
+<Layout title={`${categoria.nombre} | Tienda Esperanza`}>
+    <section class="hero-section" style="padding: 160px 0 80px;">
+        <div class="container text-center">
+            <span class="hero-subtitle">CATEGORÍA</span>
+            <h1 class="hero-title">{categoria.nombre}</h1>
+            <p class="hero-desc">{categoria.descripcion || "Descubre nuestra selección de plantas"}</p>
+            <a href="/" class="btn btn-primary">Volver al inicio</a>
+        </div>
+    </section>
+
+    <section class="container" style="padding: 60px 0;">
+        <div class="list-view">
+            {productos.map((producto) => (
+                <div class="product-wrapper" style="margin-bottom: 20px;">
+                    <ProductCard producto={producto} />
+                </div>
+            ))}
+            {productos.length === 0 && (
+                <p style="text-align: center; padding: 60px; color: #666;">
+                    No hay productos en esta categoría aún.
+                </p>
+            )}
+        </div>
+    </section>
+</Layout>
+
+<style>
+    .list-view {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+        .list-view {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
