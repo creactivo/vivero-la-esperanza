@@ -62,11 +62,8 @@ export default function Cart() {
                         Explora nuestro catálogo y encuentra las plantas perfectas para tu espacio.
                     </p>
                     <div className="empty-cart-actions">
-                        <a href="/catalogo" className="btn-explore">
-                            Explorar Catálogo
-                        </a>
-                        <a href="/" className="btn-home">
-                            Volver al inicio
+                        <a href="/" className="btn-explore">
+                            Ir al Inicio
                         </a>
                     </div>
                 </div>
@@ -126,17 +123,6 @@ export default function Cart() {
                         }
                     .btn-explore:hover {
                         background: var(--color-primary-dark);
-                    }
-                    .btn-home {
-                        color: var(--color-primary);
-                        text-decoration: none;
-                        font-weight: 500;
-                        padding: var(--space-2);
-                        transition: background 0.2s;
-                    }
-                    .btn-home:hover {
-                        background: rgba(58, 90, 64, 0.08);
-                        border-radius: var(--radius-md);
                     }
                 `}</style>
             </div>

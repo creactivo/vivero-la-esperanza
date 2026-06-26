@@ -7,6 +7,15 @@ interface AuthFormProps {
     mode: 'login' | 'registro';
 }
 
+interface FormErrors {
+    nombre?: string;
+    apellido?: string;
+    email?: string;
+    telefono?: string;
+    password?: string;
+    confirmPassword?: string;
+}
+
 async function saveUserData(userId: string, userData: { nombre: string; apellido: string; telefono: string; email: string }) {
     if (!db) throw new Error('Firebase not initialized');
     const userRef = doc(collection(db, 'usuarios'), userId);
@@ -23,26 +32,110 @@ export default function AuthForm({ mode }: AuthFormProps) {
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
     const [telefono, setTelefono] = useState('');
-    const [error, setError] = useState('');
+    const [generalError, setGeneralError] = useState('');
+    const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
+    const [touched, setTouched] = useState<Partial<Record<string, boolean>>>({});
+
+    // Validaciones
+    const validateEmail = (value: string) => {
+        if (!value) return 'El email es obligatorio';
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) return 'El email no es válido';
+        return '';
+    };
+
+    const validatePassword = (value: string) => {
+        if (!value) return 'La contraseña es obligatoria';
+        if (value.length < 6) return 'La contraseña debe tener al menos 6 caracteres';
+        return '';
+    };
+
+    const validatePhone = (value: string) => {
+        if (!value) return 'El teléfono es obligatorio';
+        const phoneRegex = /^(\+57)?\s?3\d{9}$/;
+        if (!phoneRegex.test(value.replace(/\s/g, ''))) return 'El teléfono debe tener 10 dígitos (ej: 3001234567)';
+        return '';
+    };
+
+    const validateRequired = (value: string, fieldName: string) => {
+        if (!value.trim()) return `${fieldName} es obligatorio`;
+        return '';
+    };
+
+    const validateField = (name: string, value: string) => {
+        let error = '';
+        switch (name) {
+            case 'nombre':
+                error = validateRequired(value, 'El nombre');
+                break;
+            case 'apellido':
+                error = validateRequired(value, 'El apellido');
+                break;
+            case 'email':
+                error = validateEmail(value);
+                break;
+            case 'telefono':
+                error = validatePhone(value);
+                break;
+            case 'password':
+                error = validatePassword(value);
+                break;
+            case 'confirmPassword':
+                if (mode === 'registro' && value !== password) {
+                    error = 'Las contraseñas no coinciden';
+                }
+                break;
+        }
+        return error;
+    };
+
+    const handleBlur = (name: string, value: string) => {
+        setTouched(prev => ({ ...prev, [name]: true }));
+        const error = validateField(name, value);
+        setErrors(prev => ({ ...prev, [name]: error }));
+    };
+
+    const handleChange = (name: string, value: string) => {
+        if (touched[name]) {
+            const error = validateField(name, value);
+            setErrors(prev => ({ ...prev, [name]: error }));
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError('');
+        setGeneralError('');
         setLoading(true);
+
+        // Validar todos los campos antes de enviar
+        const allErrors: FormErrors = {};
+        const fieldsToValidate = mode === 'registro' 
+            ? ['nombre', 'apellido', 'email', 'telefono', 'password', 'confirmPassword'] 
+            : ['email', 'password'];
+        
+        fieldsToValidate.forEach(name => {
+            const value = 
+                name === 'nombre' ? nombre :
+                name === 'apellido' ? apellido :
+                name === 'email' ? email :
+                name === 'telefono' ? telefono :
+                name === 'password' ? password :
+                name === 'confirmPassword' ? confirmPassword : '';
+            
+            const error = validateField(name, value);
+            if (error) allErrors[name as keyof FormErrors] = error;
+        });
+
+        if (Object.keys(allErrors).length > 0) {
+            setErrors(allErrors);
+            setTouched(fieldsToValidate.reduce((acc, name) => ({ ...acc, [name]: true }), {}));
+            setLoading(false);
+            return;
+        }
 
         try {
             if (mode === 'registro') {
-                if (password !== confirmPassword) {
-                    setError('Las contraseñas no coinciden');
-                    setLoading(false);
-                    return;
-                }
-                if (!nombre || !apellido || !telefono) {
-                    setError('Por favor completa todos los campos');
-                    setLoading(false);
-                    return;
-                }
                 const userCredential = await registerUser(email, password);
                 if (userCredential?.user) {
                     await saveUserData(userCredential.user.uid, {
@@ -72,10 +165,14 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 'Firebase not initialized': 'Por favor configura Firebase primero'
             };
 
-            setError(errorMessages[err.code] || errorMessages[err.message] || 'Error al procesar la solicitud');
+            setGeneralError(errorMessages[err.code] || errorMessages[err.message] || 'Error al procesar la solicitud');
         } finally {
             setLoading(false);
         }
+    };
+
+    const getFieldClasses = (name: string) => {
+        return touched[name] && errors[name as keyof FormErrors] ? 'error' : '';
     };
 
     return (
@@ -97,111 +194,116 @@ export default function AuthForm({ mode }: AuthFormProps) {
                     {mode === 'registro' ? (
                         <>
                             <div className="form-row">
-                                <div className="form-group">
-                                    <label htmlFor="nombre">Nombre</label>
+                                <div className={`form-group ${getFieldClasses('nombre')}`}>
+                                    <label htmlFor="nombre">Nombre *</label>
                                     <input
                                         type="text"
                                         id="nombre"
-                                        required
                                         value={nombre}
-                                        onChange={(e) => setNombre(e.target.value)}
+                                        onChange={(e) => { setNombre(e.target.value); handleChange('nombre', e.target.value); }}
+                                        onBlur={(e) => handleBlur('nombre', e.target.value)}
                                         placeholder="Tu nombre"
                                     />
+                                    {touched.nombre && errors.nombre && <span className="field-error">{errors.nombre}</span>}
                                 </div>
-                                <div className="form-group">
-                                    <label htmlFor="apellido">Apellido</label>
+                                <div className={`form-group ${getFieldClasses('apellido')}`}>
+                                    <label htmlFor="apellido">Apellido *</label>
                                     <input
                                         type="text"
                                         id="apellido"
-                                        required
                                         value={apellido}
-                                        onChange={(e) => setApellido(e.target.value)}
+                                        onChange={(e) => { setApellido(e.target.value); handleChange('apellido', e.target.value); }}
+                                        onBlur={(e) => handleBlur('apellido', e.target.value)}
                                         placeholder="Tu apellido"
                                     />
+                                    {touched.apellido && errors.apellido && <span className="field-error">{errors.apellido}</span>}
                                 </div>
                             </div>
                             <div className="form-row">
-                                <div className="form-group">
-                                    <label htmlFor="email">Email</label>
+                                <div className={`form-group ${getFieldClasses('email')}`}>
+                                    <label htmlFor="email">Email *</label>
                                     <input
                                         type="email"
                                         id="email"
-                                        required
                                         value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        onChange={(e) => { setEmail(e.target.value); handleChange('email', e.target.value); }}
+                                        onBlur={(e) => handleBlur('email', e.target.value)}
                                         placeholder="tu@email.com"
                                     />
+                                    {touched.email && errors.email && <span className="field-error">{errors.email}</span>}
                                 </div>
-                                <div className="form-group">
-                                    <label htmlFor="telefono">Teléfono</label>
+                                <div className={`form-group ${getFieldClasses('telefono')}`}>
+                                    <label htmlFor="telefono">Teléfono *</label>
                                     <input
                                         type="tel"
                                         id="telefono"
-                                        required
                                         value={telefono}
-                                        onChange={(e) => setTelefono(e.target.value)}
-                                        placeholder="+57 300 123 4567"
+                                        onChange={(e) => { setTelefono(e.target.value); handleChange('telefono', e.target.value); }}
+                                        onBlur={(e) => handleBlur('telefono', e.target.value)}
+                                        placeholder="300 123 4567"
                                     />
+                                    {touched.telefono && errors.telefono && <span className="field-error">{errors.telefono}</span>}
                                 </div>
                             </div>
                             <div className="form-row">
-                                <div className="form-group">
-                                    <label htmlFor="password">Contraseña</label>
+                                <div className={`form-group ${getFieldClasses('password')}`}>
+                                    <label htmlFor="password">Contraseña *</label>
                                     <input
                                         type="password"
                                         id="password"
-                                        required
                                         value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
+                                        onChange={(e) => { setPassword(e.target.value); handleChange('password', e.target.value); }}
+                                        onBlur={(e) => handleBlur('password', e.target.value)}
                                         placeholder="••••••••"
-                                        minLength={6}
                                     />
+                                    {touched.password && errors.password && <span className="field-error">{errors.password}</span>}
                                 </div>
-                                <div className="form-group">
-                                    <label htmlFor="confirmPassword">Confirmar contraseña</label>
+                                <div className={`form-group ${getFieldClasses('confirmPassword')}`}>
+                                    <label htmlFor="confirmPassword">Confirmar contraseña *</label>
                                     <input
                                         type="password"
                                         id="confirmPassword"
-                                        required
                                         value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        onChange={(e) => { setConfirmPassword(e.target.value); handleChange('confirmPassword', e.target.value); }}
+                                        onBlur={(e) => handleBlur('confirmPassword', e.target.value)}
                                         placeholder="••••••••"
-                                        minLength={6}
                                     />
+                                    {touched.confirmPassword && errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
                                 </div>
                             </div>
                         </>
                     ) : (
                         <>
-                            <div className="form-group">
-                                <label htmlFor="email">Email</label>
+                            <div className={`form-group ${getFieldClasses('email')}`}>
+                                <label htmlFor="email">Email *</label>
                                 <input
                                     type="email"
                                     id="email"
-                                    required
                                     value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    onChange={(e) => { setEmail(e.target.value); handleChange('email', e.target.value); }}
+                                    onBlur={(e) => handleBlur('email', e.target.value)}
                                     placeholder="tu@email.com"
                                 />
+                                {touched.email && errors.email && <span className="field-error">{errors.email}</span>}
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="password">Contraseña</label>
+                            <div className={`form-group ${getFieldClasses('password')}`}>
+                                <label htmlFor="password">Contraseña *</label>
                                 <input
                                     type="password"
                                     id="password"
-                                    required
                                     value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    onChange={(e) => { setPassword(e.target.value); handleChange('password', e.target.value); }}
+                                    onBlur={(e) => handleBlur('password', e.target.value)}
                                     placeholder="••••••••"
-                                    minLength={6}
                                 />
+                                {touched.password && errors.password && <span className="field-error">{errors.password}</span>}
                             </div>
                         </>
                     )}
 
-                    {error && (
+                    {generalError && (
                         <div className="error-message">
-                            {error}
+                            {generalError}
                         </div>
                     )}
 
@@ -222,8 +324,6 @@ export default function AuthForm({ mode }: AuthFormProps) {
                     </div>
                 </form>
             </div>
-
-
         </div>
     );
 }

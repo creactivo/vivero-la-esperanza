@@ -4,6 +4,14 @@ import { onAuthStateChanged, type User } from 'firebase/auth';
 import { doc, getDoc, collection, addDoc } from 'firebase/firestore';
 import emailjs from '@emailjs/browser';
 
+interface CheckoutFormErrors {
+    nombreCompleto?: string;
+    email?: string;
+    celular?: string;
+    direccion?: string;
+    ciudad?: string;
+}
+
 export default function CheckoutForm() {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [userData, setUserData] = useState<any>(null);
@@ -21,6 +29,8 @@ export default function CheckoutForm() {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
+    const [errors, setErrors] = useState<CheckoutFormErrors>({});
+    const [touched, setTouched] = useState<Partial<Record<string, boolean>>>({});
     const [wppLink, setWppLink] = useState('');
 
     useEffect(() => {
@@ -51,10 +61,83 @@ export default function CheckoutForm() {
         return () => unsubscribe();
     }, []);
 
+    // Validation functions
+    const validateEmail = (value: string) => {
+        if (!value) return 'El email es obligatorio';
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) return 'El email no es válido';
+        return '';
+    };
+
+    const validatePhone = (value: string) => {
+        if (!value) return 'El teléfono es obligatorio';
+        const phoneRegex = /^(\+57)?\s?3\d{9}$/;
+        if (!phoneRegex.test(value.replace(/\s/g, ''))) return 'El teléfono debe tener 10 dígitos (ej: 3001234567)';
+        return '';
+    };
+
+    const validateRequired = (value: string, fieldName: string) => {
+        if (!value.trim()) return `${fieldName} es obligatorio`;
+        return '';
+    };
+
+    const validateField = (name: string, value: string) => {
+        let error = '';
+        switch (name) {
+            case 'nombreCompleto':
+                error = validateRequired(value, 'El nombre completo');
+                break;
+            case 'email':
+                error = validateEmail(value);
+                break;
+            case 'celular':
+                error = validatePhone(value);
+                break;
+            case 'direccion':
+                error = validateRequired(value, 'La dirección');
+                break;
+            case 'ciudad':
+                error = validateRequired(value, 'La ciudad');
+                break;
+        }
+        return error;
+    };
+
+    const handleBlur = (name: string, value: string) => {
+        setTouched(prev => ({ ...prev, [name]: true }));
+        const error = validateField(name, value);
+        setErrors(prev => ({ ...prev, [name]: error }));
+    };
+
+    const handleChange = (name: string, value: string) => {
+        if (touched[name]) {
+            const error = validateField(name, value);
+            setErrors(prev => ({ ...prev, [name]: error }));
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+
+        // Only validate if NOT logged in
+        if (!currentUser) {
+            const allErrors: CheckoutFormErrors = {};
+            const fieldsToValidate = ['nombreCompleto', 'email', 'celular', 'direccion', 'ciudad'];
+            
+            fieldsToValidate.forEach(name => {
+                const error = validateField(name, formData[name as keyof typeof formData]);
+                if (error) allErrors[name as keyof CheckoutFormErrors] = error;
+            });
+
+            if (Object.keys(allErrors).length > 0) {
+                setErrors(allErrors);
+                setTouched(fieldsToValidate.reduce((acc, name) => ({ ...acc, [name]: true }), {}));
+                setLoading(false);
+                return;
+            }
+        }
 
         try {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -136,8 +219,13 @@ ${cart.map((i: any) => `- ${i.cantidad}x ${i.nombre}`).join('\n')}`;
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        handleChange(e.target.name, e.target.value);
+    };
+
+    const getFieldClasses = (name: string) => {
+        return touched[name] && errors[name as keyof CheckoutFormErrors] ? 'error' : '';
     };
 
     if (loadingUser) {
@@ -189,40 +277,52 @@ ${cart.map((i: any) => `- ${i.cantidad}x ${i.nombre}`).join('\n')}`;
                         <p>¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a> para un proceso más rápido.</p>
                     </div>
                     <form id="checkout-form-guest" className="checkout-form">
-                        <div className="form-group">
+                        <div className={`form-group ${getFieldClasses('nombreCompleto')}`}>
                             <label>Nombre Completo *</label>
                             <input
                                 type="text"
                                 name="nombreCompleto"
                                 required
                                 value={formData.nombreCompleto}
-                                onChange={handleChange}
+                                onChange={handleInputChange}
+                                onBlur={(e) => handleBlur('nombreCompleto', e.target.value)}
                                 className="input-field"
                             />
+                            {touched.nombreCompleto && errors.nombreCompleto && (
+                                <span className="field-error">{errors.nombreCompleto}</span>
+                            )}
                         </div>
 
                         <div className="form-row">
-                            <div className="form-group">
+                            <div className={`form-group ${getFieldClasses('email')}`}>
                                 <label>Email *</label>
                                 <input
                                     type="email"
                                     name="email"
                                     required
                                     value={formData.email}
-                                    onChange={handleChange}
+                                    onChange={handleInputChange}
+                                    onBlur={(e) => handleBlur('email', e.target.value)}
                                     className="input-field"
                                 />
+                                {touched.email && errors.email && (
+                                    <span className="field-error">{errors.email}</span>
+                                )}
                             </div>
-                            <div className="form-group">
+                            <div className={`form-group ${getFieldClasses('celular')}`}>
                                 <label>Celular *</label>
                                 <input
                                     type="tel"
                                     name="celular"
                                     required
                                     value={formData.celular}
-                                    onChange={handleChange}
+                                    onChange={handleInputChange}
+                                    onBlur={(e) => handleBlur('celular', e.target.value)}
                                     className="input-field"
                                 />
+                                {touched.celular && errors.celular && (
+                                    <span className="field-error">{errors.celular}</span>
+                                )}
                             </div>
                         </div>
 
@@ -232,33 +332,41 @@ ${cart.map((i: any) => `- ${i.cantidad}x ${i.nombre}`).join('\n')}`;
                                 type="text"
                                 name="empresa"
                                 value={formData.empresa}
-                                onChange={handleChange}
+                                onChange={handleInputChange}
                                 className="input-field"
                             />
                         </div>
 
                         <div className="form-row">
-                            <div className="form-group">
+                            <div className={`form-group ${getFieldClasses('direccion')}`}>
                                 <label>Dirección de Envío *</label>
                                 <input
                                     type="text"
                                     name="direccion"
                                     required
                                     value={formData.direccion}
-                                    onChange={handleChange}
+                                    onChange={handleInputChange}
+                                    onBlur={(e) => handleBlur('direccion', e.target.value)}
                                     className="input-field"
                                 />
+                                {touched.direccion && errors.direccion && (
+                                    <span className="field-error">{errors.direccion}</span>
+                                )}
                             </div>
-                            <div className="form-group">
+                            <div className={`form-group ${getFieldClasses('ciudad')}`}>
                                 <label>Ciudad *</label>
                                 <input
                                     type="text"
                                     name="ciudad"
                                     required
                                     value={formData.ciudad}
-                                    onChange={handleChange}
+                                    onChange={handleInputChange}
+                                    onBlur={(e) => handleBlur('ciudad', e.target.value)}
                                     className="input-field"
                                 />
+                                {touched.ciudad && errors.ciudad && (
+                                    <span className="field-error">{errors.ciudad}</span>
+                                )}
                             </div>
                         </div>
                     </form>
