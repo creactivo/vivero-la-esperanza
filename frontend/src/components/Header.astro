@@ -1,14 +1,14 @@
 ---
 import CartCounter from "./CartCounter";
 import AuthStatus from "./AuthStatus.tsx";
-import { ShoppingBag, Menu } from "lucide-react";
+import MobileNav from "./MobileNav.tsx";
+import { ShoppingBag } from "lucide-react";
 ---
 
 <header class="site-header">
     <div class="header-top container">
-        <button class="mobile-nav-toggle" aria-label="Abrir menú">
-            <Menu size={24} />
-        </button>
+        <!-- Mobile Nav Toggle (Island) -->
+        <MobileNav client:only="react" />
 
         <nav class="nav-left">
             <a href="/">Inicio</a>
@@ -40,14 +40,6 @@ import { ShoppingBag, Menu } from "lucide-react";
             </a>
         </div>
     </div>
-
-    <div class="mobile-nav">
-        <nav>
-            <a href="/">Inicio</a>
-            <a href="/nuestro-vivero">Nuestro Vivero</a>
-            <a href="/proyectos">Proyectos</a>
-        </nav>
-    </div>
 </header>
 
 <script is:inline>
@@ -58,31 +50,8 @@ import { ShoppingBag, Menu } from "lucide-react";
         let header = document.querySelector(".site-header");
         if (!header) return;
 
-        // Update header immediately on load
         updateHeaderOnScroll();
-
-        // Scroll handler (without throttle for smoothness)
         window.addEventListener("scroll", updateHeaderOnScroll, { passive: true });
-
-        // Mobile nav handlers
-        document.addEventListener("click", function(event) {
-            const target = event.target;
-            if (!(target instanceof Element)) return;
-            const toggleButton = target.closest('.mobile-nav-toggle');
-            if (toggleButton && header) {
-                header.classList.toggle("nav-open");
-            }
-        });
-
-        document.addEventListener("click", function(event) {
-            const target = event.target;
-            if (!(target instanceof Element)) return;
-            const mobileNav = target.closest('.mobile-nav');
-            const toggleBtn = target.closest('.mobile-nav-toggle');
-            if (!mobileNav && !toggleBtn && header && header.classList.contains("nav-open")) {
-                header.classList.remove("nav-open");
-            }
-        });
 
         function updateHeaderOnScroll() {
             if (window.scrollY > 50) {
@@ -171,10 +140,8 @@ import { ShoppingBag, Menu } from "lucide-react";
             opacity 0.3s ease;
     }
     .site-header.scrolled .logo-text img {
-        /* Solo una sutil escala, sin cambiar dimensiones base */
         transform: scale(1.02);
     }
-
 
     .cart-icon-link {
         position: relative;
@@ -207,32 +174,71 @@ import { ShoppingBag, Menu } from "lucide-react";
         transition: color 0.3s ease;
     }
 
-    .mobile-nav {
-        display: none;
-        position: absolute;
-        top: 100%;
+    /* Mobile Nav Drawer */
+    .mobile-nav-overlay {
+        position: fixed;
+        top: 0;
         left: 0;
         width: 100%;
-        background: var(--color-surface);
-        box-shadow: var(--shadow-md);
-        padding: 20px;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1001;
+        animation: fadeIn 0.2s ease;
     }
 
-    .mobile-nav nav {
+    .mobile-nav-drawer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 85%;
+        max-width: 320px;
+        height: 100%;
+        background: white;
+        z-index: 1002;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+        box-shadow: 4px 0 20px rgba(0,0,0,0.15);
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        padding: 30px 20px;
     }
 
-    .mobile-nav a {
+    .mobile-nav-drawer.open {
+        transform: translateX(0);
+    }
+
+    .mobile-nav-header {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 30px;
+    }
+
+    .mobile-nav-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        color: var(--color-text);
+    }
+
+    .mobile-nav-links {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .mobile-nav-links a {
         text-decoration: none;
         color: var(--color-text);
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         font-weight: 500;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+        transition: color 0.2s ease;
     }
 
-    .site-header.nav-open .mobile-nav {
-        display: block;
+    .mobile-nav-links a:hover {
+        color: #00975d;
     }
 
     .auth-status-container {
@@ -271,10 +277,10 @@ import { ShoppingBag, Menu } from "lucide-react";
         align-items: center;
         gap: 8px;
         cursor: pointer;
-        list-style: none; /* Remove default marker */
+        list-style: none;
     }
     :global(.user-info-trigger::-webkit-details-marker) {
-        display: none; /* Remove default marker for Chrome */
+        display: none;
     }
 
     :global(.user-identifier) {
@@ -328,6 +334,11 @@ import { ShoppingBag, Menu } from "lucide-react";
         color: var(--color-text);
     }
 
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
     @media (max-width: 768px) {
         .nav-left {
             display: none;
@@ -339,9 +350,6 @@ import { ShoppingBag, Menu } from "lucide-react";
 
         .header-top {
             justify-content: space-between;
-        }
-
-        .nav-right {
         }
 
         .logo-container {
