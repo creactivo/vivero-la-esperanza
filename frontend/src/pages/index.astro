@@ -320,7 +320,7 @@ const carruseles = Array.from(productosPorCategoria.entries());
     .search-input {
         flex: 1;
         border: none;
-        padding: 15px 25px;
+        padding: 8px 25px;
         border-radius: var(--radius-full);
         outline: none;
     }
@@ -329,7 +329,7 @@ const carruseles = Array.from(productosPorCategoria.entries());
         background-color: var(--color-primary-dark);
         color: white;
         border: none;
-        padding: 10px 30px;
+        padding: 8px 30px;
         border-radius: 9999px;
         font-weight: 500;
         letter-spacing: 1px;
@@ -550,6 +550,10 @@ const carruseles = Array.from(productosPorCategoria.entries());
     }
 
     @media (max-width: 768px) {
+        .quick-filters {
+        margin-top: 60%; /* Space for the floating search bar */
+        margin-bottom: 30px;
+        }
         .filter-grid {
             grid-template-columns: 1fr 1fr;
         }
@@ -569,7 +573,8 @@ const carruseles = Array.from(productosPorCategoria.entries());
         }
         .filter-item {
             font-size: 12px;
-            padding: 12px;
+            padding: 8px;
+            border-radius: 50px;
             gap: 8px;
         }
         .icon svg{
