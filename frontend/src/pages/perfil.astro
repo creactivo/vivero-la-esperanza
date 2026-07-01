@@ -129,4 +129,93 @@ import OrderDetailsModal from '../components/OrderDetailsModal.tsx';
     font-weight: bold;
     margin-top: 10px;
   }
+
+  /* Responsive styles for mobile devices (< 768px) */
+  @media (max-width: 768px) {
+    .container {
+      padding-top: 100px;
+      padding-left: 15px;
+      padding-right: 15px;
+      padding-bottom: 40px;
+    }
+
+    .profile-header {
+      margin-bottom: 25px;
+    }
+
+    .profile-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .profile-header p {
+      font-size: 0.95rem;
+      padding: 0 10px;
+    }
+
+    .profile-layout {
+      grid-template-columns: 1fr;
+      gap: 25px;
+    }
+
+    /* Convert sidebar to horizontal tabs for mobile */
+    .profile-sidebar {
+      position: sticky;
+      top: 80px;
+      z-index: 100;
+      background: white;
+      padding: 15px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .profile-sidebar nav {
+      flex-direction: row;
+      justify-content: space-around;
+      gap: 5px;
+    }
+
+    .profile-sidebar a {
+      padding: 10px 15px;
+      font-size: 0.85rem;
+      text-align: center;
+      flex: 1;
+    }
+
+    .card {
+      padding: 20px 15px;
+    }
+
+    .profile-content h2 {
+      font-size: 1.25rem;
+    }
+
+    :global(.user-data-fields) p {
+      font-size: 0.9rem;
+    }
+
+    :global(.order-item) {
+      padding: 18px 0;
+    }
+
+    .order-items-list {
+      font-size: 0.85rem;
+    }
+  }
+
+  /* Extra small devices (< 480px) */
+  @media (max-width: 480px) {
+    .profile-sidebar a {
+      padding: 8px 10px;
+      font-size: 0.78rem;
+    }
+
+    .container {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .card {
+      padding: 15px 12px;
+    }
+  }
 </style>
