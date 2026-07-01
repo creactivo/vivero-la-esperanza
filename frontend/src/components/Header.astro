@@ -147,7 +147,8 @@ import { ShoppingBag, Menu, X } from "lucide-react";
         width: 100%;
         z-index: 1000;
         padding: 10px 0;
-        background: #f8fbf395;
+        backdrop-filter: blur(5px);
+        background: #f8fbf3b0;
         transition:
             background-color 0.3s ease,
             box-shadow 0.3s ease;
@@ -159,7 +160,7 @@ import { ShoppingBag, Menu, X } from "lucide-react";
     .site-header:not(.scrolled) .logout-button,
     .site-header:not(.scrolled) .user-identifier,
     .site-header:not(.scrolled) .mobile-nav-toggle {
-        color: rgb(0, 121, 30);
+        color: var(--color-secondary);
     }
 
     .site-header.scrolled {
