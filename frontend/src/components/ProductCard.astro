@@ -51,9 +51,6 @@ const { nombre, precio, stock, slug, imagenes } = producto;
                             <Heart size={14} fill="#00FF85" color="#00FF85" />
                         ))                }
             </div>
-        </div>
-
-        <div class="product-details-col">
             <div class="stock-info">
                 {typeof stock === "number"
                     ? stock > 0
@@ -61,6 +58,9 @@ const { nombre, precio, stock, slug, imagenes } = producto;
                         : "Agotado"
                     : "falta este elemento error 404"}
             </div>
+        </div>
+
+        <div class="product-details-col">
             <div class="product-price">
                 {typeof precio === "number"
                     ? `$${precio.toLocaleString("es-CO")}`
