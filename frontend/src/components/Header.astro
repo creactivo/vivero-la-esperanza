@@ -1,7 +1,7 @@
 ---
 import CartCounter from "./CartCounter";
 import AuthStatus from "./AuthStatus.tsx";
-import { ShoppingBag, Menu } from "lucide-react";
+import { ShoppingBag, Menu, X } from "lucide-react";
 ---
 
 <header class="site-header">
@@ -41,11 +41,21 @@ import { ShoppingBag, Menu } from "lucide-react";
         </div>
     </div>
 
+    <div class="mobile-overlay"></div>
     <div class="mobile-nav">
-        <nav>
+        <div class="mobile-nav-header">
+            <button class="mobile-nav-close" aria-label="Cerrar menú">
+                <X size={24} />
+            </button>
+        </div>
+        <nav class="mobile-nav-links">
             <a href="/">Inicio</a>
             <a href="/nuestro-vivero">Nuestro Vivero</a>
             <a href="/proyectos">Proyectos</a>
+            <a href="/login">Iniciar Sesión</a>
+            <a href="/registro">Registrarse</a>
+            <a href="/perfil">Mi Perfil</a>
+            <a href="/carrito">Mi Carrito</a>
         </nav>
     </div>
 </header>
@@ -61,22 +71,55 @@ import { ShoppingBag, Menu } from "lucide-react";
         updateHeaderOnScroll();
         window.addEventListener("scroll", updateHeaderOnScroll, { passive: true });
 
+        // Toggle menu open
         document.addEventListener("click", function(event) {
             const target = event.target;
             if (!(target instanceof Element)) return;
             const toggleButton = target.closest('.mobile-nav-toggle');
             if (toggleButton && header) {
                 header.classList.toggle("nav-open");
+                document.body.classList.toggle('mobile-menu-open', header.classList.contains("nav-open"));
             }
         });
 
+        // Close menu with close button
         document.addEventListener("click", function(event) {
             const target = event.target;
             if (!(target instanceof Element)) return;
-            const mobileNav = target.closest('.mobile-nav');
-            const toggleBtn = target.closest('.mobile-nav-toggle');
-            if (!mobileNav && !toggleBtn && header && header.classList.contains("nav-open")) {
+            const closeButton = target.closest('.mobile-nav-close');
+            if (closeButton && header && header.classList.contains("nav-open")) {
                 header.classList.remove("nav-open");
+                document.body.classList.remove('mobile-menu-open');
+            }
+        });
+
+        // Close menu when clicking on overlay or outside
+        document.addEventListener("click", function(event) {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+            const overlay = target.closest('.mobile-overlay');
+            if (overlay && header && header.classList.contains("nav-open")) {
+                header.classList.remove("nav-open");
+                document.body.classList.remove('mobile-menu-open');
+            }
+        });
+
+        // Close menu when clicking on any link inside mobile menu
+        document.addEventListener("click", function(event) {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+            const mobileLink = target.closest('.mobile-nav-links a');
+            if (mobileLink && header && header.classList.contains("nav-open")) {
+                header.classList.remove("nav-open");
+                document.body.classList.remove('mobile-menu-open');
+            }
+        });
+
+        // Close menu with Escape key
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Escape" && header && header.classList.contains("nav-open")) {
+                header.classList.remove("nav-open");
+                document.body.classList.remove('mobile-menu-open');
             }
         });
 
@@ -91,6 +134,11 @@ import { ShoppingBag, Menu } from "lucide-react";
 </script>
 
 <style>
+    /* Prevent body scroll when mobile menu is open */
+    body.mobile-menu-open {
+        overflow: hidden;
+    }
+
     /* Header Styles */
     .site-header {
         position: fixed;
@@ -102,8 +150,16 @@ import { ShoppingBag, Menu } from "lucide-react";
         background: transparent;
         transition:
             background-color 0.3s ease,
-            box-shadow 0.3s ease,
-            color 0.3s ease;
+            box-shadow 0.3s ease;
+    }
+
+    /* Text colors for transparent state (when at top of page) */
+    .site-header:not(.scrolled) .nav-left a,
+    .site-header:not(.scrolled) .nav-right a,
+    .site-header:not(.scrolled) .logout-button,
+    .site-header:not(.scrolled) .user-identifier,
+    .site-header:not(.scrolled) .mobile-nav-toggle {
+        color: white;
     }
 
     .site-header.scrolled {
@@ -144,7 +200,6 @@ import { ShoppingBag, Menu } from "lucide-react";
         display: flex;
         justify-content: flex-end;
         align-items: center;
-        color: var(--color-text);
     }
 
     .logo-container {
@@ -156,8 +211,7 @@ import { ShoppingBag, Menu } from "lucide-react";
         display: flex;
         flex-direction: column;
         align-items: center;
-        color: #4a235a;
-        transition: color 0.3s ease;
+        transition: all 0.3s ease;
     }
     .logo-text img {
         width: 120px;
@@ -165,9 +219,11 @@ import { ShoppingBag, Menu } from "lucide-react";
         transition:
             transform 0.3s ease,
             opacity 0.3s ease;
+        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
     }
     .site-header.scrolled .logo-text img {
         transform: scale(1.02);
+        filter: none;
     }
 
     .cart-icon-link {
@@ -201,32 +257,116 @@ import { ShoppingBag, Menu } from "lucide-react";
         transition: color 0.3s ease;
     }
 
-    .mobile-nav {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: var(--color-surface);
-        box-shadow: var(--shadow-md);
-        padding: 20px;
+    /* Mobile Overlay */
+    .mobile-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transition: 
+            opacity 0.3s ease,
+            visibility 0.3s ease;
+        z-index: 999;
     }
 
-    .mobile-nav nav {
+    .site-header.nav-open .mobile-overlay {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Mobile Navigation - Slides from left */
+    .mobile-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 280px;
+        background: white;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1002;
         display: flex;
         flex-direction: column;
-        gap: 15px;
-    }
-
-    .mobile-nav a {
-        text-decoration: none;
-        color: var(--color-text);
-        font-size: 1.2rem;
-        font-weight: 500;
     }
 
     .site-header.nav-open .mobile-nav {
-        display: block;
+        transform: translateX(0);
+    }
+
+    .mobile-nav-header {
+        display: flex;
+        justify-content: flex-end;
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .mobile-nav-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        color: var(--color-text);
+        transition: color 0.3s ease;
+    }
+
+    .mobile-nav-close:hover {
+        color: #00975d;
+    }
+
+    .mobile-nav-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 20px 0;
+    }
+
+    .mobile-nav-links a {
+        text-decoration: none;
+        color: var(--color-text);
+        font-size: 1.1rem;
+        font-weight: 500;
+        padding: 12px 25px;
+        transition: 
+            background-color 0.2s ease,
+            color 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .mobile-nav-links a:hover {
+        background-color: #f5f5f5;
+        color: #00975d;
+        border-left-color: #00975d;
+    }
+
+    /* Media Query for Mobile */
+    @media (max-width: 768px) {
+        .mobile-nav-toggle {
+            display: block;
+        }
+
+        .nav-left,
+        .auth-status-container {
+            display: none;
+        }
+
+        .header-top {
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .logo-container {
+            order: 2;
+        }
+
+        .mobile-nav-toggle {
+            order: 1;
+        }
+
+        .nav-right {
+            order: 3;
+        }
     }
 
     .auth-status-container {
