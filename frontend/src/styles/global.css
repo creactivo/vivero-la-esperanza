@@ -559,7 +559,6 @@ textarea::placeholder {
 
 .hero-title {
     font-size: 3rem;
-    text-transform: uppercase;
     margin: 20px 0;
     color: var(--color-primary);
     letter-spacing: -1px;
